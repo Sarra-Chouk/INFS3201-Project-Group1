@@ -50,7 +50,7 @@ async function validatePassword(password) {
 async function createSaltedHash(password) {
     const salt = crypto.randomBytes(4).toString('hex');
     const hash = crypto.createHash('sha1')
-    hash.update(salt + password) //you forgot the salt here
+    hash.update(salt + password) 
     const saltedHash = salt + ":" + hash.digest('hex')
     return saltedHash
 }
@@ -70,6 +70,28 @@ async function createUser(username, email, password, languagesKnown, languagesLe
     } 
 }
 
+async function checkLogin(email, password) {
+    try {
+        const user = await persistence.getUserByEmail(email)
+        if (!user) {
+            return false
+        }
+        const [storedSalt, storedHash] = user.password.split(':')
+        const hash = crypto.createHash('sha1')
+        hash.update(storedSalt + password) 
+        const inputHash = hash.digest('hex')
+        if (inputHash === storedHash) { 
+            return true
+        } else {
+            return false
+        }
+    }
+    catch (error) {
+        console.error('Error during login check:', error)
+        return false
+    }
+}
+
 async function updatePassword(email, newPassword) {
     const user = await persistence.getUserByEmail(email)
     if (!user) {
@@ -77,4 +99,16 @@ async function updatePassword(email, newPassword) {
     }
     const saltedHash = createSaltedHash(newPassword)
     await persistence.updatePassword(email, saltedHash)
+}
+
+module.exports = {
+    startSession,
+    getSession,
+    deleteSession,
+    checkLogin,
+    validateEmail,
+    validatePassword,
+    validateUsername,
+    createUser,
+    updatePassword
 }
