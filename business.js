@@ -54,3 +54,18 @@ async function createSaltedHash(password) {
     const saltedHash = salt + ":" + hash.digest('hex')
     return saltedHash
 }
+
+async function createUser(username, email, password, languagesKnown, languagesLearning, profilePicture) {
+    const hashedPassword = createSaltedHash(password) 
+    if (await validateEmail && await validateUsername && await validatePassword) {
+        const user = {
+            username: username,
+            email: email,
+            password: hashedPassword,
+            languagesKnown: languagesKnown,
+            languagesLerning: languagesLearning,
+            profilePicture: profilePicture,
+        }
+        await persistence.createUser(user)
+    } 
+}
