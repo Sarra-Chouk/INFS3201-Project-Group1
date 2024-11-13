@@ -18,3 +18,13 @@ async function connectDatabase() {
         badges = db.collection('badges')
     }
 }
+
+async function saveSession(session) {
+    try {
+        await connectDatabase()
+        await sessions.insertOne(session)
+        console.log("Session saved successfully.")
+    } catch (error) {
+        console.error("Error saving session:", error)
+    }
+}
