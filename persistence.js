@@ -100,3 +100,13 @@ async function updatePassword(email, newPassword) {
 
 }
 
+module.exports = {
+    saveSession,
+    getSession,
+    deleteSession,
+    connectDatabase,
+    getUserByUsername,
+    getUserByEmail,
+    createUser,
+    updatePassword
+}
