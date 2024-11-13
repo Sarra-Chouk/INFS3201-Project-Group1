@@ -28,3 +28,12 @@ async function saveSession(session) {
         console.error("Error saving session:", error)
     }
 }
+
+async function getSession(key) {
+    try {
+        await connectDatabase()
+        return await sessions.findOne({ sessionKey: key });
+    } catch (error) {
+        console.error("Error finding session data:", error)
+    }
+}
