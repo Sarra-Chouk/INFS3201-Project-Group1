@@ -47,3 +47,10 @@ async function validatePassword(password) {
     )
 }
 
+async function createSaltedHash(password) {
+    const salt = crypto.randomBytes(4).toString('hex');
+    const hash = crypto.createHash('sha1')
+    hash.update(salt + password) //you forgot the salt here
+    const saltedHash = salt + ":" + hash.digest('hex')
+    return saltedHash
+}
