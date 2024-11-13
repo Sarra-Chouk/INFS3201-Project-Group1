@@ -74,3 +74,14 @@ async function getUserByUsername(username) {
         console.error("Error fetching user by username:", error)
     }
 }
+
+async function createUser(user) {
+    try {
+        await connectDatabase()
+        const result = await users.insertOne(user)
+        return result.insertedId //added the return of the id of the user that was created if we need it for checking
+    }
+    catch (error) {
+        console.error("Error creating user:", error)
+    }
+}
