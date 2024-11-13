@@ -51,3 +51,26 @@ async function deleteSession(key) {
         console.error("Error deleting session:", error)
     }
 }
+
+async function getUserByEmail(email) {
+    try {
+        await connectDatabase()
+        const user = await users.findOne({ email })
+        return user
+    }
+    catch (error) {
+        console.error("Error fetching user by email:", error)
+    }
+
+}
+
+async function getUserByUsername(username) {
+    try {
+        await connectDatabase()
+        const user = await users.findOne({ username })
+        return user
+    }
+    catch (error) {
+        console.error("Error fetching user by username:", error)
+    }
+}
