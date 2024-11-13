@@ -69,3 +69,12 @@ async function createUser(username, email, password, languagesKnown, languagesLe
         await persistence.createUser(user)
     } 
 }
+
+async function updatePassword(email, newPassword) {
+    const user = await persistence.getUserByEmail(email)
+    if (!user) {
+        return false
+    }
+    const saltedHash = createSaltedHash(newPassword)
+    await persistence.updatePassword(email, saltedHash)
+}
