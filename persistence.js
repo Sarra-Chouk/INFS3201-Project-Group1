@@ -85,3 +85,17 @@ async function createUser(user) {
         console.error("Error creating user:", error)
     }
 }
+
+async function updatePassword(email, newPassword) {
+    try {
+        await connectDatabase()
+        const result = await users.updateOne(
+            { email: email },
+            { $set: { password: newPassword } })
+        return result.modifiedCount > 0 // added this to make sure that a password has been actually updated
+    }
+    catch (error) {
+        console.error("Error updating password:", error)
+    }
+
+}
