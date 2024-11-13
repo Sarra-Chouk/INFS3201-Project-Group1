@@ -19,3 +19,31 @@ async function getSession(key) {
 async function deleteSession(key) {
     return await persistence.deleteSession(key)
 }
+
+async function validateEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    const user = persistence.getUserByEmail(email)
+    return emailRegex.test(email) && !user
+}
+
+async function validateUsername(username) {
+    const user = await persistence.getUserByUsername(username);
+    return !user 
+}
+
+async function validatePassword(password) {
+    const lengthRegex = /^.{8,}$/
+    const numberRegex = /[0-9]/
+    const specialCharRegex = /[!@#$%^&*(),.?":{}|<>]/
+    const upperCaseRegex = /[A-Z]/
+    const lowerCaseRegex = /[a-z]/
+
+    return (
+        lengthRegex.test(password) &&
+        numberRegex.test(password) &&
+        specialCharRegex.test(password) &&
+        upperCaseRegex.test(password) &&
+        lowerCaseRegex.test(password)
+    )
+}
+
