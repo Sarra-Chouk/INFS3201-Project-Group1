@@ -86,6 +86,14 @@ async function createUser(user) {
     }
 }
 
+async function storeResetKey(email, resetKey) {
+    await connectDatabase()
+    await users.updateOne(
+        { email: email },
+        { $set: { resetKey: resetKey } }
+    )
+}
+
 async function updatePassword(email, newPassword) {
     try {
         await connectDatabase()
@@ -101,12 +109,8 @@ async function updatePassword(email, newPassword) {
 }
 
 module.exports = {
-    saveSession,
-    getSession,
-    deleteSession,
-    connectDatabase,
-    getUserByUsername,
-    getUserByEmail,
+    saveSession, getSession, deleteSession,
+    getUserByUsername, getUserByEmail,
     createUser,
-    updatePassword
+    storeResetKey, updatePassword
 }
