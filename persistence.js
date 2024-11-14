@@ -2,7 +2,7 @@ const mongodb = require('mongodb')
 
 let client = undefined
 let db = undefined
-let users = undefined
+let users = undefined 
 let sessions = undefined
 let messages = undefined
 let badges = undefined
@@ -37,7 +37,7 @@ async function getSession(key) {
         console.error("Error finding session data:", error)
     }
 }
-
+   
 async function deleteSession(key) {
     try {
         await connectDatabase()
