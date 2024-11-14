@@ -94,7 +94,7 @@ async function storeResetKey(email, resetKey) {
     )
 }
 
-async function findUserByResetKey(resetKey) {
+async function getUserByResetKey(resetKey) {
     await connectDatabase()
     const userByResetKey = await users.findOne({ resetKey: resetKey })
     return userByResetKey
@@ -126,5 +126,5 @@ module.exports = {
     saveSession, getSession, deleteSession,
     getUserByUsername, getUserByEmail,
     createUser,
-    storeResetKey, findUserByResetKey, clearResetKey, updatePassword
+    storeResetKey, getUserByResetKey, clearResetKey, updatePassword
 }

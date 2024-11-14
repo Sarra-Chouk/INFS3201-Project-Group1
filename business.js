@@ -1,5 +1,11 @@
 const persistence = require('./persistence')
 const crypto = require("crypto")
+const nodemailer = require("nodemailer")
+
+let transporter = nodemailer.createTransport({
+    host: "127.0.0.1",
+    port: 25,
+})
 
 async function startSession() {
     const uuid = crypto.randomUUID()
@@ -20,9 +26,13 @@ async function deleteSession(key) {
     return await persistence.deleteSession(key)
 }
 
+async function getUserByEmail(email) {
+    return await persistence.getUserByEmail(email)
+}
+
 async function validateEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    const user = persistence.getUserByEmail(email)
+    const user = await getUserByEmail(email)
     return emailRegex.test(email) && !user
 }
 
@@ -92,6 +102,45 @@ async function checkLogin(email, password) {
     }
 }
 
+async function storeResetKey(email) {
+    let resetKey = crypto.randomUUID();
+    await persistence.storeResetKey(email, resetKey)
+    return resetKey
+}
+
+async function getUserByResetKey(resetKey) {
+    return await persistence.getUserByResetKey(resetKey)
+}
+
+async function sendPasswordResetEmail(email, resetKey) {
+    const resetLink = `http://localhost:8000/update-password?key=${resetKey}`
+    const body = `
+    <p>Hello,</p>
+    <p>You requested a password reset. Click the link below to reset your password:</p>
+    <a href="${resetLink}">${resetLink}</a>
+    <p>If you did not request a password reset, please ignore this email.</p>
+    `;
+    await transporter.sendMail({
+        from: 'no-reply@INFS3201.com',
+        to: email,
+        subject: 'Password Reset Request',
+        html: body,
+    })
+}
+
+async function resetPassword(resetKey, newPassword, confirmPassword) {
+    if (newPassword !== confirmPassword) {
+        throw new Error("Passwords do not match")
+    }
+    const user = await persistence.findUserByResetKey(resetKey)
+    if (!user) {
+        throw new Error("Invalid or expired reset key")
+    }
+    const saltedHash = await createSaltedHash(newPassword)
+    await persistence.updatePassword(user.email, saltedHash)
+    await persistence.clearResetKey(user.email)
+}
+
 async function updatePassword(email, newPassword) {
     const user = await persistence.getUserByEmail(email)
     if (!user) {
@@ -102,13 +151,10 @@ async function updatePassword(email, newPassword) {
 }
 
 module.exports = {
-    startSession,
-    getSession,
-    deleteSession,
-    checkLogin,
-    validateEmail,
-    validatePassword,
-    validateUsername,
+    startSession, getSession, deleteSession,
+    getUserByEmail,
+    validateEmail, validatePassword, validateUsername,
     createUser,
-    updatePassword
+    checkLogin,
+    storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword
 }
