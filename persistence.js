@@ -88,9 +88,10 @@ async function createUser(user) {
 
 async function storeResetKey(email, resetKey) {
     await connectDatabase()
+    const expiry = new Date(Date.now() + 5 * 60 * 1000)
     await users.updateOne(
         { email: email },
-        { $set: { resetKey: resetKey } }
+        { $set: { resetKey: resetKey, resetKeyExpiry: expiry } }
     )
 }
 
