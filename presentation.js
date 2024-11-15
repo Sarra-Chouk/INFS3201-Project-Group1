@@ -120,7 +120,7 @@ app.post("/reset-password", async (req, res) => {
 app.get("/update-password", async (req, res) => {
     const resetKey = req.query.key
     const message = req.query.message
-    const user = await business.findUserByResetKey(resetKey) 
+    const user = await business.getUserByResetKey(resetKey) 
     if (!user) {
         return res.redirect('/?message=Invalid or expired reset key.')
     }
