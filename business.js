@@ -142,8 +142,8 @@ async function sendPasswordResetEmail(email, resetKey) {
     })
 }
 
-async function resetPassword(resetKey, newPassword, confirmPassword) {
-    if (newPassword !== confirmPassword) {
+async function resetPassword(resetKey, newPassword, confirmedPassword) {
+    if (newPassword !== confirmedPassword) {
         throw new Error("Passwords do not match")
     }
     const user = await persistence.findUserByResetKey(resetKey)

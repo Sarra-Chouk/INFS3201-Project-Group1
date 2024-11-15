@@ -103,16 +103,38 @@ app.get("/logout", async (req, res) => {
 app.get("/dashboard", async (req, res) => {
 })
 
-app.get("/reset-password", (req, res) => {
+app.get("/reset-password", async(req, res) => {
+    res.render('resetPassword')
 })
 
 app.post("/reset-password", async (req, res) => {
+    let email = req.body.email
+    const user = await business.getUserByEmail(email)
+    if (user) {
+        const resetKey = await business.storeResetKey(email)
+        await business.sendPasswordResetEmail(email, resetKey)
+    }
+    res.redirect('/?message=Password reset email sent. Please check your inbox.')
 })
 
 app.get("/update-password", async (req, res) => {
+    const resetKey = req.query.key
+    const message = req.query.message
+    const user = await business.findUserByResetKey(resetKey) 
+    if (!user) {
+        return res.redirect('/?message=Invalid or expired reset key.')
+    }
+    res.render('updatePassword', { resetKey: resetKey, message: message })
 })
 
 app.post("/update-password", async (req, res) => {
+    const { resetKey, newPassword, confirmedPassword } = req.body
+    try {
+        await business.resetPassword(resetKey, newPassword, confirmedPassword)
+        res.redirect('/?message=Password reset successful. Please log in with your new password.')
+    } catch (error) {
+        res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent(error.message)}`)
+    }
 })
 
 app.listen(8000, () => { })
