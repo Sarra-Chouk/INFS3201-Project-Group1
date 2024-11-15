@@ -56,6 +56,21 @@ async function validatePassword(password) {
     )
 }
 
+async function validateProfilePicture(profilePicture) {
+    if (!profilePicture) {
+        return { isValid: true }
+    }
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!allowedTypes.includes(profilePicture.mimetype)) {
+        return { isValid: false, message: "Invalid file type. Only JPEG, JPG and PNG are allowed." }
+    }
+    const maxSize = 5 * 1024 * 1024
+    if (profilePicture.size > maxSize) {
+        return { isValid: false, message: "File size too large. Please upload an image smaller than 5MB." }
+    }
+    return { isValid: true };
+}
+
 async function createSaltedHash(password) {
     const salt = crypto.randomBytes(4).toString('hex');
     const hash = crypto.createHash('sha1')
@@ -152,7 +167,7 @@ async function updatePassword(email, newPassword) {
 module.exports = {
     startSession, getSession, deleteSession,
     getUserByEmail,
-    validateEmail, validatePassword, validateUsername,
+    validateEmail, validatePassword, validateUsername, validateProfilePicture,
     createUser,
     checkLogin,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword

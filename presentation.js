@@ -1,17 +1,17 @@
-const express=require("express")
+const express = require("express")
 const business = require("./business.js")
 const bodyParser = require("body-parser")
 const cookieParser = require("cookie-parser")
 const handlebars = require("express-handlebars")
-const fileUpload =require('express-fileupload')
+const fileUpload = require('express-fileupload')
 let app = express()
 
-app.set("views", __dirname+"/templates")
+app.set("views", __dirname + "/templates")
 app.set("view engine", "handlebars")
 app.engine("handlebars", handlebars.engine())
-app.use(bodyParser.urlencoded({extended: false}))
+app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use('/images', express.static(__dirname+"/static/profilePictures"))
+app.use('/images', express.static(__dirname + "/static/profilePictures"))
 app.use(fileUpload())
 
 app.get("/", (req, res) => {
@@ -25,13 +25,14 @@ app.get("/sign-up", (req, res) => {
 app.post("/sign-up", async (req, res) => {
     const { username, email, password, knownLanguages, learningLanguages } = req.body
     const profilePicture = req.files ? req.files.profilePicture : null
-    const knownLanguagesArray = Array.isArray( knownLanguages) ?  knownLanguages : [ knownLanguages]
+    const knownLanguagesArray = Array.isArray(knownLanguages) ? knownLanguages : [knownLanguages]
     const learningLanguagesArray = Array.isArray(learningLanguages) ? learningLanguages : [learningLanguages]
 
     try {
         const isEmailValid = await business.validateEmail(email)
         const isPasswordValid = await business.validatePassword(password)
         const isUsernameValid = await business.validateUsername(username)
+        const isProfilePictureValid = await business.validateProfilePicture(profilePicture)
 
         if (!isEmailValid) {
             throw new Error("Invalid or already registered email address.")
@@ -41,6 +42,9 @@ app.post("/sign-up", async (req, res) => {
         }
         if (isUsernameValid) {
             throw new Error("Username is already taken. Please choose a different one.")
+        }
+        if (!isProfilePictureValid.isValid) {
+            throw new Error(isProfilePictureValid.message)
         }
 
         let profilePicturePath = "/images/defaultProfilePic.jpg"
@@ -83,4 +87,4 @@ app.get("/update-password", async (req, res) => {
 app.post("/update-password", async (req, res) => {
 })
 
-app.listen(8000, () => {})
+app.listen(8000, () => { })
