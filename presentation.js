@@ -64,9 +64,26 @@ app.post("/sign-up", async (req, res) => {
 })
 
 app.get("/login'", (req, res) => {
+    const message = req.query.message
+    res.render("login", { message })
 })
 
 app.post("/login", async (req, res) => {
+    const { email, password } = req.body
+    try {
+        const isValidLogin = await business.checkLogin(email, password)
+
+        if (!isValidLogin) {
+            throw new Error("Invalid email or password.");
+        }
+
+        const sessionKey = await business.startSession()
+        res.cookie("sessionKey", sessionKey, {httpOnly: true})
+        res.redirect("/dashboard")
+    } catch (error){
+        console.error("Login error:", error.message)
+        res.redirect("/login?message=" + encodeURIComponent(error.message))
+    }
 })
 
 app.get("/logout", async (req, res) => {
