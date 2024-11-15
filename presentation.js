@@ -87,6 +87,17 @@ app.post("/login", async (req, res) => {
 })
 
 app.get("/logout", async (req, res) => {
+    const sessionKey = req.cookies.sessionKey
+    try {
+        if (sessionKey) {
+            await business.deleteSession(sessionKey);
+            res.clearCookie("sessionKey");
+        }
+        res.redirect("/login?message=" + encodeURIComponent("You have been logged out. Please login again!"));
+    } catch (error) {
+        console.error("Logout error:", error.message);
+        res.redirect("/dashboard?message=" + encodeURIComponent("An error occurred while logging out."));
+    }
 })
 
 app.get("/dashboard", async (req, res) => {
