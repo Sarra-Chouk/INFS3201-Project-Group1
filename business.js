@@ -37,8 +37,7 @@ async function validateEmail(email) {
 }
 
 async function validateUsername(username) {
-    const user = await persistence.getUserByUsername(username);
-    return !user 
+    return await persistence.getUserByUsername(username)
 }
 
 async function validatePassword(password) {
@@ -65,16 +64,16 @@ async function createSaltedHash(password) {
     return saltedHash
 }
 
-async function createUser(username, email, password, languagesKnown, languagesLearning, profilePicture) {
+async function createUser(username, email, password, knownLanguages, learningLanguages, profilePicturePath) {
     const hashedPassword = createSaltedHash(password) 
     if (await validateEmail && await validateUsername && await validatePassword) {
         const user = {
             username: username,
             email: email,
             password: hashedPassword,
-            languagesKnown: languagesKnown,
-            languagesLerning: languagesLearning,
-            profilePicture: profilePicture,
+            knownLanguages: knownLanguages,
+            learningLanguages: learningLanguages,
+            profilePicturePath: profilePicturePath,
         }
         await persistence.createUser(user)
     } 
