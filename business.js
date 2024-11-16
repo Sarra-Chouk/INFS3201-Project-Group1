@@ -71,7 +71,7 @@ async function validateProfilePicture(profilePicture) {
     return { isValid: true };
 }
 
-async function createSaltedHash(password) {
+function createSaltedHash(password) {
     const salt = crypto.randomBytes(4).toString('hex');
     const hash = crypto.createHash('sha1')
     hash.update(salt + password) 
@@ -150,7 +150,7 @@ async function resetPassword(resetKey, newPassword, confirmedPassword) {
     if (!user) {
         throw new Error("Invalid or expired reset key")
     }
-    const saltedHash = await createSaltedHash(newPassword)
+    const saltedHash = createSaltedHash(newPassword)
     await persistence.updatePassword(user.email, saltedHash)
     await persistence.clearResetKey(user.email)
 }
