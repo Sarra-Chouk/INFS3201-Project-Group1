@@ -109,7 +109,7 @@ app.get("/dashboard", async (req, res) => {
 })
 
 app.get("/reset-password", async(req, res) => {
-    res.render('resetPassword')
+    res.send("Coming Soon...")
 })
 
 app.post("/reset-password", async (req, res) => {
@@ -119,7 +119,7 @@ app.post("/reset-password", async (req, res) => {
         const resetKey = await business.storeResetKey(email)
         await business.sendPasswordResetEmail(email, resetKey)
     }
-    res.redirect('/?message=Password reset email sent. Please check your inbox.')
+    res.redirect('/reset-password?message=Password reset email sent. Please check your inbox.')
 })
 
 app.get("/update-password", async (req, res) => {
