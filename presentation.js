@@ -51,7 +51,7 @@ app.post("/sign-up", async (req, res) => {
             throw new Error(isProfilePictureValid.message)
         }
 
-        let profilePicturePath = "/images/defaultProfilePic.jpg"
+        let profilePicturePath = "/images/defaultProfilePicture.jpg"
         if (profilePicture) {
             const uniqueFileName = `${Date.now()}_${profilePicture.name}`
             profilePicturePath = `/images/${uniqueFileName}`
