@@ -1,0 +1,132 @@
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, shrink-to-fit=no">
+    <title>Register - GlobeLingo</title>
+    <!-- Bootstrap Styles -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .dropdown-menu {
+            max-height: 250px;
+            overflow-y: auto;
+            width: 100%;
+            padding: 10px;
+            box-shadow: 0px 4px 6px rgba(138, 43, 226, 0.2);
+        }
+        .form-check {
+            margin-bottom: 8px;
+        }
+        .btn-primary {
+            background-color: #8e24aa;
+            border-color: #8e24aa;
+        }
+        .btn-primary:hover {
+            background-color: #6a1b9a;
+            border-color: #6a1b9a;
+        }
+        .btn-success {
+            background-color: #8e24aa;
+            border-color: #8e24aa;
+        }
+        .btn-success:hover {
+            background-color: #6a1b9a;
+            border-color: #6a1b9a;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-light min-vh-100 d-flex flex-row align-items-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-body p-4">
+                            <h1>Register</h1>
+                            <p class="text-muted">Create your account</p>
+                            <!-- Display error message if available -->
+                            {{#if message}}
+                                <div class="alert alert-danger">{{message}}</div>
+                            {{/if}}
+                            <form action="/sign-up" method="POST" enctype="multipart/form-data">
+                                <div class="mb-3">
+                                    <label for="username" class="form-label">Username</label>
+                                    <input class="form-control" type="text" id="username" name="username" placeholder="Enter your username" value="{{username}}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="email" class="form-label">Email</label>
+                                    <input class="form-control" type="text" id="email" name="email" placeholder="Enter your email" value="{{email}}" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input class="form-control" type="password" id="password" name="password" placeholder="Enter your password" required>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="confirmedPassword" class="form-label">Confirm Password</label>
+                                    <input class="form-control" type="password" id="confirmedPassword" name="confirmedPassword" placeholder="Repeat your password" required>
+                                </div>
+
+                                <!-- Languages You Speak Fluently -->
+                                <div class="mb-3">
+                                    <label for="knownLanguages" class="form-label">Languages You Speak Fluently</label>
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle w-100" type="button" id="dropdownMenuKnownLanguages" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Select Languages
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuKnownLanguages">
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="English" id="languageEnglish" name="knownLanguages"><label class="form-check-label" for="languageEnglish">English</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Spanish" id="languageSpanish" name="knownLanguages"><label class="form-check-label" for="languageSpanish">Spanish</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="French" id="languageFrench" name="knownLanguages"><label class="form-check-label" for="languageFrench">French</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="German" id="languageGerman" name="knownLanguages"><label class="form-check-label" for="languageGerman">German</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Chinese" id="languageChinese" name="knownLanguages"><label class="form-check-label" for="languageChinese">Chinese</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Japanese" id="languageJapanese" name="knownLanguages"><label class="form-check-label" for="languageJapanese">Japanese</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Korean" id="languageKorean" name="knownLanguages"><label class="form-check-label" for="languageKorean">Korean</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Hindi" id="languageHindi" name="knownLanguages"><label class="form-check-label" for="languageHindi">Hindi</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Arabic" id="languageArabic" name="knownLanguages"><label class="form-check-label" for="languageArabic">Arabic</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Russian" id="languageRussian" name="knownLanguages"><label class="form-check-label" for="languageRussian">Russian</label></div></li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Languages You Would Like to Learn -->
+                                <div class="mb-3">
+                                    <label for="learningLanguages" class="form-label">Languages You Would Like to Learn</label>
+                                    <div class="dropdown">
+                                        <button class="btn btn-primary dropdown-toggle w-100" type="button" id="dropdownMenuLearningLanguages" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Select Languages
+                                        </button>
+                                        <ul class="dropdown-menu" aria-labelledby="dropdownMenuLearningLanguages">
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="English" id="languageEnglishLearn" name="learningLanguages"><label class="form-check-label" for="languageEnglishLearn">English</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Spanish" id="languageSpanishLearn" name="learningLanguages"><label class="form-check-label" for="languageSpanishLearn">Spanish</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="French" id="languageFrenchLearn" name="learningLanguages"><label class="form-check-label" for="languageFrenchLearn">French</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="German" id="languageGermanLearn" name="learningLanguages"><label class="form-check-label" for="languageGermanLearn">German</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Chinese" id="languageChineseLearn" name="learningLanguages"><label class="form-check-label" for="languageChineseLearn">Chinese</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Japanese" id="languageJapaneseLearn" name="learningLanguages"><label class="form-check-label" for="languageJapaneseLearn">Japanese</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Korean" id="languageKoreanLearn" name="learningLanguages"><label class="form-check-label" for="languageKoreanLearn">Korean</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Hindi" id="languageHindiLearn" name="learningLanguages"><label class="form-check-label" for="languageHindiLearn">Hindi</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Arabic" id="languageArabicLearn" name="learningLanguages"><label class="form-check-label" for="languageArabicLearn">Arabic</label></div></li>
+                                            <li><div class="form-check"><input class="form-check-input" type="checkbox" value="Russian" id="languageRussianLearn" name="learningLanguages"><label class="form-check-label" for="languageRussianLearn">Russian</label></div></li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <!-- Profile Picture Upload -->
+                                <div class="mb-3">
+                                    <label for="profilePicture" class="form-label">Profile Picture</label>
+                                    <input class="form-control" type="file" id="profilePicture" name="profilePicture" accept="image/*">
+                                </div>
+
+                                <button class="btn btn-success w-100" type="submit">Create Account</button>
+                            </form>
+                            <p class="text-center mt-3">Already have an account? <a href="/login" class="text-primary">Log in</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap and necessary plugins -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
