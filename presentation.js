@@ -15,6 +15,7 @@ app.use('/images', express.static(__dirname + "/static/profilePictures"))
 app.use(fileUpload())
 
 app.get("/", (req, res) => {
+    res.render("index")
 })
 
 app.get("/sign-up", (req, res) => {
@@ -23,7 +24,7 @@ app.get("/sign-up", (req, res) => {
 })
 
 app.post("/sign-up", async (req, res) => {
-    const { username, email, password, knownLanguages, learningLanguages } = req.body
+    const { username, email, password, confirmedPassword, knownLanguages, learningLanguages } = req.body
     const profilePicture = req.files ? req.files.profilePicture : null
     const knownLanguagesArray = Array.isArray(knownLanguages) ? knownLanguages : [knownLanguages]
     const learningLanguagesArray = Array.isArray(learningLanguages) ? learningLanguages : [learningLanguages]
@@ -39,6 +40,9 @@ app.post("/sign-up", async (req, res) => {
         }
         if (!isPasswordValid) {
             throw new Error("Password must be at least 8 characters, include a number, a special character, an uppercase and lowercase letter.")
+        }
+        if (confirmedPassword.trim() != password.trim()) {
+            throw new Error("Passwords do not match. Please ensure both password fields are the same.")
         }
         if (isUsernameValid) {
             throw new Error("Username is already taken. Please choose a different one.")
@@ -63,7 +67,7 @@ app.post("/sign-up", async (req, res) => {
     }
 })
 
-app.get("/login'", (req, res) => {
+app.get("/login", (req, res) => {
     const message = req.query.message
     res.render("login", { message })
 })
@@ -101,6 +105,7 @@ app.get("/logout", async (req, res) => {
 })
 
 app.get("/dashboard", async (req, res) => {
+    res.send("Coming Soon...")
 })
 
 app.get("/reset-password", async(req, res) => {
