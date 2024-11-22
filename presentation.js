@@ -13,6 +13,7 @@ const hbs = handlebars.create({
         }
     }
 })
+
 app.set("views", __dirname + "/templates")
 app.set("view engine", "handlebars")
 app.engine("handlebars", hbs.engine)
@@ -49,7 +50,7 @@ app.post("/sign-up", async (req, res) => {
             throw new Error("Password must be at least 8 characters, include a number, a special character, an uppercase and lowercase letter.")
         }
         if (confirmedPassword.trim() != password.trim()) {
-            throw new Error("Passwords do not match. Please ensure both password fields are the same.")
+            throw new Error("The passwords you entered do not match. Please ensure both password fields are the same.")
         }
         if (isUsernameValid) {
             throw new Error("Username is already taken. Please choose a different one.")
@@ -91,9 +92,9 @@ app.post("/login", async (req, res) => {
         }
 
         const sessionKey = await business.startSession()
-        res.cookie("sessionKey", sessionKey, {httpOnly: true})
+        res.cookie("sessionKey", sessionKey, { httpOnly: true })
         res.redirect("/dashboard")
-    } catch (error){
+    } catch (error) {
         console.error("Login error:", error.message)
         res.redirect("/login?message=" + encodeURIComponent(error.message))
     }
@@ -117,10 +118,10 @@ app.get("/dashboard", async (req, res) => {
     res.send("Coming Soon...")
 })
 
-app.get("/reset-password", async(req, res) => {
+app.get("/reset-password", async (req, res) => {
     const message = req.query.message
     const type = req.query.type
-    res.render("resetPassword", {message, type})
+    res.render("resetPassword", { message, type })
 })
 
 app.post("/reset-password", async (req, res) => {
@@ -145,21 +146,30 @@ app.post("/reset-password", async (req, res) => {
 app.get("/update-password", async (req, res) => {
     const resetKey = req.query.key
     const message = req.query.message
-    const user = await business.getUserByResetKey(resetKey) 
-    if (!user) {
-        return res.redirect('/?message=Invalid or expired reset key.')
+    const type = req.query.type
+    try {
+        const user = await business.getUserByResetKey(resetKey);
+        if (!user) {
+            return res.redirect(`/update-password?message=${encodeURIComponent("Your reset link is invalid or has expired. Please request a new link.")}&type=error`);
+        }
+        res.render('updatePassword', { resetKey, message, type });
+    } catch (error) {
+        console.error("Error fetching reset key:", error.message);
+        res.redirect(`/update-password?message=${encodeURIComponent("An unexpected error occurred. Please try again.")}&type=error`);
     }
-    res.render('updatePassword', { resetKey: resetKey, message: message })
 })
 
 app.post("/update-password", async (req, res) => {
     const { resetKey, newPassword, confirmedPassword } = req.body
     try {
-        await business.resetPassword(resetKey, newPassword, confirmedPassword)
-        res.redirect('/?message=Password reset successful. Please log in with your new password.')
+        const resetResult = await business.resetPassword(resetKey, newPassword, confirmedPassword)
+        if (resetResult.success) {
+            return res.redirect(`/login?message=${encodeURIComponent("Password reset successful. Please log in with your new password.")}&type=success`)
+        }
     } catch (error) {
-        res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent(error.message)}`)
-    }
+        console.error("Error in update password process:", error.message)
+        res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent(error.message)}&type=error`)
+    } 
 })
 
 app.listen(8000, () => { })

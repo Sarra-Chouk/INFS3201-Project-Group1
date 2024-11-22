@@ -89,16 +89,23 @@ async function createUser(user) {
 async function storeResetKey(email, resetKey) {
     await connectDatabase()
     const expiry = new Date(Date.now() + 5 * 60 * 1000)
+    const resetKeyObject = {
+        value: resetKey,
+        expiry: expiry
+    }
     await users.updateOne(
         { email: email },
-        { $set: { resetKey: resetKey, resetKeyExpiry: expiry } }
+        { $set: { resetKey: resetKeyObject} }
     )
 }
 
 async function getUserByResetKey(resetKey) {
     await connectDatabase()
-    const userByResetKey = await users.findOne({ resetKey: resetKey })
-    return userByResetKey
+    const user = await users.findOne({ "resetKey.value": resetKey })
+    if (user && user.resetKey.expiry > new Date()) {
+        return user
+    }
+    return null
 }
 
 async function clearResetKey(email) {

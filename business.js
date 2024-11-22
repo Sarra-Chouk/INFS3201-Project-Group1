@@ -148,16 +148,20 @@ async function sendPasswordResetEmail(email, resetKey) {
 }
 
 async function resetPassword(resetKey, newPassword, confirmedPassword) {
-    if (newPassword !== confirmedPassword) {
-        throw new Error("Passwords do not match")
+    if (! await validatePassword(newPassword)) {
+        throw new Error("Password must be at least 8 characters, include a number, a special character, an uppercase and lowercase letter.")
     }
-    const user = await persistence.findUserByResetKey(resetKey)
+    if (newPassword.trim() !== confirmedPassword.trim()) {
+        throw new Error("The passwords you entered do not match. Please ensure both password fields are the same.")
+    }
+    const user = await persistence.getUserByResetKey(resetKey)
     if (!user) {
-        throw new Error("Invalid or expired reset key")
+        throw new Error("Your reset link is invalid or has expired. Please request a new link.")
     }
     const saltedHash = createSaltedHash(newPassword)
     await persistence.updatePassword(user.email, saltedHash)
     await persistence.clearResetKey(user.email)
+    return { success: true }
 }
 
 async function updatePassword(email, newPassword) {
