@@ -66,6 +66,11 @@
                     <!-- Login Section -->
                     <div class="card col-md-7 p-4 mb-0">
                         <div class="card-body">
+                             {{#if message}}
+                                <div class="alert text-center {{#ifEquals type "success"}}alert-success{{else}}alert-danger{{/ifEquals}}">
+                                    {{message}}
+                                </div>
+                            {{/if}}
                             <h1>Login</h1>
                             <p class="text-medium-emphasis">Sign In to your account</p>
                             <form action="/login" method="POST">

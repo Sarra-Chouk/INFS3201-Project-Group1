@@ -6,9 +6,16 @@ const handlebars = require("express-handlebars")
 const fileUpload = require('express-fileupload')
 let app = express()
 
+const hbs = handlebars.create({
+    helpers: {
+        ifEquals: (arg1, arg2, options) => {
+            return (arg1 === arg2) ? options.fn(this) : options.inverse(this)
+        }
+    }
+})
 app.set("views", __dirname + "/templates")
 app.set("view engine", "handlebars")
-app.engine("handlebars", handlebars.engine())
+app.engine("handlebars", hbs.engine)
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use('/images', express.static(__dirname + "/static/profilePictures"))
@@ -59,7 +66,8 @@ app.post("/sign-up", async (req, res) => {
         }
 
         await business.createUser(username, email, password, knownLanguagesArray, learningLanguagesArray, profilePicturePath)
-        res.redirect("/login?message=Registration successful. Please log in.")
+        res.redirect(`/login?message=${encodeURIComponent("Registration successful.")}&type=success`)
+
     }
     catch (error) {
         console.error("Signup error:", error.message)
@@ -69,7 +77,8 @@ app.post("/sign-up", async (req, res) => {
 
 app.get("/login", (req, res) => {
     const message = req.query.message
-    res.render("login", { message })
+    const type = req.query.type
+    res.render("login", { message, type })
 })
 
 app.post("/login", async (req, res) => {
@@ -78,7 +87,7 @@ app.post("/login", async (req, res) => {
         const isValidLogin = await business.checkLogin(email, password)
 
         if (!isValidLogin) {
-            throw new Error("Invalid email or password.");
+            return res.redirect(`/login?message=${encodeURIComponent("Invalid email or password.")}&type=error`)
         }
 
         const sessionKey = await business.startSession()
@@ -109,17 +118,28 @@ app.get("/dashboard", async (req, res) => {
 })
 
 app.get("/reset-password", async(req, res) => {
-    res.send("Coming Soon...")
+    const message = req.query.message
+    const type = req.query.type
+    res.render("resetPassword", {message, type})
 })
 
 app.post("/reset-password", async (req, res) => {
-    let email = req.body.email
-    const user = await business.getUserByEmail(email)
-    if (user) {
+    const email = req.body.email
+    try {
+        const emailExists = await business.checkEmailExists(email)
+
+        if (!emailExists) {
+            return res.redirect('/reset-password?message=' + encodeURIComponent('Invalid or not registered email address.') + '&type=error')
+        }
+
         const resetKey = await business.storeResetKey(email)
         await business.sendPasswordResetEmail(email, resetKey)
+        res.redirect('/reset-password?message=' + encodeURIComponent('Password reset email sent. Please check your inbox.') + '&type=success')
+
+    } catch (error) {
+        console.error("Error in reset password process:", error.message)
+        return res.redirect('/reset-password?message=' + encodeURIComponent('An unexpected error occurred. Please try again.') + '&type=error')
     }
-    res.redirect('/reset-password?message=Password reset email sent. Please check your inbox.')
 })
 
 app.get("/update-password", async (req, res) => {

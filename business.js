@@ -36,6 +36,11 @@ async function validateEmail(email) {
     return emailRegex.test(email) && !user
 }
 
+async function checkEmailExists(email) {
+    const user = await persistence.getUserByEmail(email)
+    return !!user
+}
+
 async function validateUsername(username) {
     return await persistence.getUserByUsername(username)
 }
@@ -167,7 +172,7 @@ async function updatePassword(email, newPassword) {
 module.exports = {
     startSession, getSession, deleteSession,
     getUserByEmail,
-    validateEmail, validatePassword, validateUsername, validateProfilePicture,
+    validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture,
     createUser,
     checkLogin,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword
