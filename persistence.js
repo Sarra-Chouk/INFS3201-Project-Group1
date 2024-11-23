@@ -167,8 +167,6 @@ async function removeContact(userId, contactId) {
     }
 }
 
-
-
 module.exports = {
     saveSession, getSession, deleteSession, updateSession,
     getUserByUsername, getUserByEmail,

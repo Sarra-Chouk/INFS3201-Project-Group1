@@ -28,38 +28,17 @@ app.get("/", (req, res) => {
 
 app.get("/sign-up", async (req, res) => {
     const message = req.query.message
-
-    try {
-
-        const tempSessionKey = await business.startSession()
-        const csrfToken = await business.generateFormToken(tempSessionKey)
-        res.cookie("tempSessionKey", tempSessionKey, { httpOnly: true })
-    
-        res.render("signup", { message, csrfToken })
-    }
-
-    catch (error) {
-
-        console.error("Error initializing temporary session for sign-up:", error.message)
-        res.redirect(`/sign-up?message=${encodeURIComponent("An unexpected error occurred. Please try again.")}`)
-
-    }
+    res.render("signup", { message}) 
 })
 
 app.post("/sign-up", async (req, res) => {
-    const { csrfToken, username, email, password, confirmedPassword, knownLanguages, learningLanguages } = req.body
+    const { username, email, password, confirmedPassword, knownLanguages, learningLanguages } = req.body
     const tempSessionKey = req.cookies.tempSessionKey
     const profilePicture = req.files ? req.files.profilePicture : null
     const knownLanguagesArray = Array.isArray(knownLanguages) ? knownLanguages : [knownLanguages]
     const learningLanguagesArray = Array.isArray(learningLanguages) ? learningLanguages : [learningLanguages]
 
     try {
-
-        const sessionData = await business.getSession(tempSessionKey)
-        if (!sessionData || sessionData.csrfToken != csrfToken) {
-            console.error("CSRF token mismatch.")
-            return res.redirect(`/sign-up?message=${encodeURIComponent("Your session has expired or is invalid. Please try again.")}`)
-        }
 
         const isEmailValid = await business.validateEmail(email)
         const isPasswordValid = await business.validatePassword(password)
@@ -102,12 +81,6 @@ app.post("/sign-up", async (req, res) => {
 
         console.error("Signup error:", error.message)
         res.redirect("/sign-up?message=" + encodeURIComponent(error.message))
-
-    }
-    
-    finally {
-
-    await business.cancelToken(tempSessionKey)
 
     }
 })
@@ -200,18 +173,16 @@ app.get("/update-password", async (req, res) => {
     const resetKey = req.query.key
     const message = req.query.message
     const type = req.query.type
-    const sessionKey = req.cookies.sessionKey
 
     try {
 
-        const csrfToken = await business.generateFormToken(sessionKey)
         const user = await business.getUserByResetKey(resetKey)
 
         if (!user) {
             return res.redirect(`/update-password?message=${encodeURIComponent("Your reset link is invalid or has expired. Please request a new link.")}&type=error`)
         }
 
-        res.render('updatePassword', { resetKey, csrfToken, message, type })
+        res.render('updatePassword', { resetKey, message, type })
     } catch (error) {
 
         console.error("Error fetching reset key:", error.message)
@@ -222,16 +193,8 @@ app.get("/update-password", async (req, res) => {
 
 app.post("/update-password", async (req, res) => {
     const { resetKey, csrfToken, newPassword, confirmedPassword } = req.body
-    const sessionKey = req.cookies.sessionKey;
 
     try {
-        
-        const sessionData = await business.getSession(sessionKey)
-
-        if (!sessionData || sessionData.csrfToken != csrfToken) {
-            console.error("CSRF token mismatch.")
-            return res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent("Your session has expired or is invalid. Please try again.")}&type=error`)
-        }
         
         const resetResult = await business.resetPassword(resetKey, newPassword, confirmedPassword)
 
@@ -246,11 +209,7 @@ app.post("/update-password", async (req, res) => {
         console.error("Error in update password process:", error.message);
         res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent("An unexpected error occurred. Please try again.")}&type=error`)
 
-    } finally {
-
-        await business.cancelToken(sessionKey)
-    }
+    } 
 })
-
 
 app.listen(8000, () => { })
