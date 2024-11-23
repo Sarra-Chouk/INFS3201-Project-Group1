@@ -208,4 +208,23 @@ app.post("/update-password", async (req, res) => {
     } 
 })
 
+app.get("/user/:userId/badges", async (req, res) => {
+    const { userId } = req.params
+
+    try {
+
+        const badges = await persistence.getUserBadges(userId)
+
+        if (badges.length === 0) {
+            return res.render("badges", { message: "No badges found." })
+        }
+        res.render("badges", { badges })
+
+    } catch (error) {
+
+        console.error("Error fetching user badges:", error.message)
+
+    }
+})
+
 app.listen(8000, () => { })
