@@ -12,7 +12,7 @@ async function startSession() {
     const expiry = new Date(Date.now() + 5 * 60 * 1000)
     const session = {
         sessionKey: uuid,
-        expiry: expiry
+        expiry: expiry,
     }
     await persistence.saveSession(session)
     return uuid
@@ -24,6 +24,20 @@ async function getSession(key) {
 
 async function deleteSession(key) {
     return await persistence.deleteSession(key)
+}
+
+async function generateFormToken(key) {
+    let token = crypto.randomUUID()
+    let sessionData = await persistence.getSession(key)
+    sessionData.csrfToken = token
+    await persistence.updateSession(key, sessionData)
+    return token
+}
+
+async function cancelToken(key) {
+    let sessionData = await persistence.getSession(key)
+    delete sessionData.csrfToken
+    await persistence.updateSession(key, sessionData)
 }
 
 async function getUserByEmail(email) {
@@ -171,6 +185,7 @@ async function updatePassword(email, newPassword) {
 
 module.exports = {
     startSession, getSession, deleteSession,
+    generateFormToken, cancelToken,
     getUserByEmail,
     validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture,
     createUser,

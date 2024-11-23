@@ -52,6 +52,16 @@ async function deleteSession(key) {
     }
 }
 
+async function updateSession(key, data) {
+    try {
+        await connectDatabase()
+        await sessions.replaceOne({sessionKey: key}, data)
+    }
+    catch (error) {
+        console.error("Error updating session:", error)
+    }
+}
+
 async function getUserByEmail(email) {
     try {
         await connectDatabase()
@@ -130,7 +140,7 @@ async function updatePassword(email, newPassword) {
 }
 
 module.exports = {
-    saveSession, getSession, deleteSession,
+    saveSession, getSession, deleteSession, updateSession,
     getUserByUsername, getUserByEmail,
     createUser,
     storeResetKey, getUserByResetKey, clearResetKey, updatePassword
