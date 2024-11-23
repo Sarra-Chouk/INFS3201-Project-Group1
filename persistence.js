@@ -143,6 +143,20 @@ async function addContact(userId, contactId) {
     }
 }
 
+async function removeContact(userId, contactId) {
+    try {
+        await connectDatabase();
+        await users.updateOne(
+            { _id: new mongodb.ObjectId(userId) },
+            { $pull: { contacts: contactId } }
+        );
+        console.log(`Contact ${contactId} removed from user ${userId}'s contact list.`);
+    } catch (error) {
+        console.error("Error removing contact:", error);
+        throw error; 
+    }
+}
+
 
 
 module.exports = {
@@ -150,4 +164,5 @@ module.exports = {
     getUserByUsername, getUserByEmail,
     createUser,
     storeResetKey, getUserByResetKey, clearResetKey, updatePassword, addContact
+    ,removeContact
 }
