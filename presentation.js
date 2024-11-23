@@ -33,7 +33,6 @@ app.get("/sign-up", async (req, res) => {
 
 app.post("/sign-up", async (req, res) => {
     const { username, email, password, confirmedPassword, knownLanguages, learningLanguages } = req.body
-    const tempSessionKey = req.cookies.tempSessionKey
     const profilePicture = req.files ? req.files.profilePicture : null
     const knownLanguagesArray = Array.isArray(knownLanguages) ? knownLanguages : [knownLanguages]
     const learningLanguagesArray = Array.isArray(learningLanguages) ? learningLanguages : [learningLanguages]
@@ -156,9 +155,6 @@ app.post("/reset-password", async (req, res) => {
 
         const resetKey = await business.storeResetKey(email)
         await business.sendPasswordResetEmail(email, resetKey)
-        const tempSessionKey = await business.startSession()
-        res.cookie("sessionKey", tempSessionKey, { httpOnly: true })
-
         res.redirect('/reset-password?message=' + encodeURIComponent('Password reset email sent. Please check your inbox.') + '&type=success')
 
     } catch (error) {
