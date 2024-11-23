@@ -190,11 +190,93 @@ async function getContacts(userId) {
     }
 }
 
+async function createBadge(badge) {
+    try {
+        await connectDatabase()
+        const badgeResult = await badges.insertOne(badge)
+        console.log("Badge created successfully.")
+    } catch (error) {
+        console.error("Error creating badge:", error)
+    }
+}
+
+async function getAllBadges() {
+    try {
+        await connectDatabase()
+        return await badges.find({}).toArray()
+    } catch (error) {
+        console.error("Error fetching badges:", error)
+        return []
+    }
+}
+
+async function getUserBadges(userId) {
+    try {
+        await connectDatabase()
+        const user = await users.findOne(
+            { _id: new mongodb.ObjectId(userId) },
+            { projection: { badges: 1, _id: 0 } } 
+        )
+        if (!user) {
+            console.log(`User with ID ${userId} not found.`)
+            return []
+        }
+        return user.badges || []
+    } catch (error) {
+        console.error("Error fetching user badges:", error)
+        return []
+    }
+}
+
+async function awardBadge(userId, badge) {
+    try {
+        await connectDatabase()
+        const timestamp = new Date()
+        const badgeWithTimestamp = { ...badge, timestamp }
+        await users.updateOne(
+            { _id: new mongodb.ObjectId(userId) },
+            { $push: { badges: badgeWithTimestamp } }
+        )
+        console.log(`Badge added to user ${userId}:`, badge.name)
+    } catch (error) {
+        console.error("Error adding badge to user:", error)
+    }
+}
+
+async function initializeBadges() {
+    try {
+        await connectDatabase()
+
+        const badgesToAdd = [
+            {
+                name: "First Conversation",
+                imageUrl: "/images/badges/firstConversation.png"
+            },
+            {
+                name: "100 Messages Sent",
+                imageUrl: "/images/badges/Messages100.png"
+            }
+        ]
+
+        for (const badge of badgesToAdd) {
+            const existingBadge = await badges.findOne({ name: badge.name })
+            if (!existingBadge) {
+                await createBadge(badge)
+            } else {
+                console.log(`Badge "${badge.name}" already exists.`)
+            }
+        }
+        console.log("Badges initialized successfully.")
+    } catch (error) {
+        console.error("Error initializing badges:", error)
+    }
+}
 
 module.exports = {
     saveSession, getSession, deleteSession, updateSession,
     getUserByUsername, getUserByEmail,
     createUser,
     storeResetKey, getUserByResetKey, clearResetKey, updatePassword,
-    addContact, removeContact, getContacts
+    addContact, removeContact, getContacts,
+    getAllBadges, getUserBadges, awardBadge
 }
