@@ -163,13 +163,14 @@ app.post("/update-password", async (req, res) => {
     const { resetKey, newPassword, confirmedPassword } = req.body
     try {
         const resetResult = await business.resetPassword(resetKey, newPassword, confirmedPassword)
-        if (resetResult.success) {
-            return res.redirect(`/login?message=${encodeURIComponent("Password reset successful. Please log in with your new password.")}&type=success`)
+        if (!resetResult.isValid) {
+            return res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent(resetResult.message)}&type=error`)
         }
+        res.redirect(`/login?message=${encodeURIComponent("Password reset successful. Please log in with your new password.")}&type=success`)
     } catch (error) {
         console.error("Error in update password process:", error.message)
         res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent(error.message)}&type=error`)
-    } 
+    }
 })
 
 app.listen(8000, () => { })

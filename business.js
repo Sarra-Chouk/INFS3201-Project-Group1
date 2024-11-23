@@ -109,11 +109,7 @@ async function checkLogin(email, password) {
         const hash = crypto.createHash('sha1')
         hash.update(storedSalt + password) 
         const inputHash = hash.digest('hex')
-        if (inputHash === storedHash) { 
-            return true
-        } else {
-            return false
-        }
+        return inputHash === storedHash
     }
     catch (error) {
         console.error('Error during login check:', error)
@@ -149,19 +145,19 @@ async function sendPasswordResetEmail(email, resetKey) {
 
 async function resetPassword(resetKey, newPassword, confirmedPassword) {
     if (! await validatePassword(newPassword)) {
-        throw new Error("Password must be at least 8 characters, include a number, a special character, an uppercase and lowercase letter.")
+        return { isValid: false, message: "Password must be at least 8 characters, include a number, a special character, an uppercase and lowercase letter."}
     }
     if (newPassword.trim() !== confirmedPassword.trim()) {
-        throw new Error("The passwords you entered do not match. Please ensure both password fields are the same.")
+        return {isValid: false, message: "The passwords you entered do not match. Please ensure both password fields are the same."}
     }
     const user = await persistence.getUserByResetKey(resetKey)
     if (!user) {
-        throw new Error("Your reset link is invalid or has expired. Please request a new link.")
+        return { isValid: false, message: "Your reset link is invalid or has expired. Please request a new link."}
     }
     const saltedHash = createSaltedHash(newPassword)
     await persistence.updatePassword(user.email, saltedHash)
     await persistence.clearResetKey(user.email)
-    return { success: true }
+    return { isValid: true}
 }
 
 async function updatePassword(email, newPassword) {

@@ -32,7 +32,7 @@ async function saveSession(session) {
 async function getSession(key) {
     try {
         await connectDatabase()
-        return await sessions.findOne({ sessionKey: key });
+        return await sessions.findOne({ sessionKey: key })
     } catch (error) {
         console.error("Error finding session data:", error)
     }
@@ -41,11 +41,11 @@ async function getSession(key) {
 async function deleteSession(key) {
     try {
         await connectDatabase()
-        const result = await sessions.deleteOne({ sessionKey: key });
+        const result = await sessions.deleteOne({ sessionKey: key })
         if (result.deletedCount === 1) {
-            console.log("Session deleted successfully.");
+            console.log("Session deleted successfully.")
         } else {
-            console.log("No session found with the given key.");
+            console.log("No session found with the given key.")
         }
     } catch (error) {
         console.error("Error deleting session:", error)
@@ -61,7 +61,6 @@ async function getUserByEmail(email) {
     catch (error) {
         console.error("Error fetching user by email:", error)
     }
-
 }
 
 async function getUserByUsername(username) {
