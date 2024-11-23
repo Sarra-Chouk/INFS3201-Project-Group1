@@ -157,12 +157,36 @@ async function removeContact(userId, contactId) {
     }
 }
 
+async function getContacts(userId) {
+    try {
+        await connectDatabase();
+        const user = await users.findOne(
+            { _id: new mongodb.ObjectId(userId) },
+            { projection: { contacts: 1 } } 
+        );
+
+        if (user) {
+            if (user.contacts) {
+                return user.contacts; 
+            } else {
+                return []; 
+            }
+        } else {
+            return []; 
+        }
+    } catch (error) {
+        console.error("Error retrieving contacts:", error);
+        throw error; 
+    }
+}
+
+
 
 
 module.exports = {
     saveSession, getSession, deleteSession,
     getUserByUsername, getUserByEmail,
     createUser,
-    storeResetKey, getUserByResetKey, clearResetKey, updatePassword, addContact
-    ,removeContact
+    storeResetKey, getUserByResetKey, clearResetKey, updatePassword,
+    addContact, removeContact, getContacts
 }
