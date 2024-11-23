@@ -129,9 +129,25 @@ async function updatePassword(email, newPassword) {
 
 }
 
+async function addContact(userId, contactId) {
+    try {
+        await connectDatabase();
+        await users.updateOne(
+            { _id: new mongodb.ObjectId(userId) },
+            { $addToSet: { contacts: contactId } } 
+        );
+        console.log(`Contact ${contactId} added to user ${userId}'s contact list.`);
+    } catch (error) {
+        console.error("Error adding contact:", error);
+        throw error; 
+    }
+}
+
+
+
 module.exports = {
     saveSession, getSession, deleteSession,
     getUserByUsername, getUserByEmail,
     createUser,
-    storeResetKey, getUserByResetKey, clearResetKey, updatePassword
+    storeResetKey, getUserByResetKey, clearResetKey, updatePassword, addContact
 }
