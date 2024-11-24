@@ -101,7 +101,6 @@ app.get("/verify-email", async (req, res) => {
     }
 })
 
-
 app.get("/login", (req, res) => {
     const message = req.query.message
     const type = req.query.type
@@ -114,10 +113,6 @@ app.post("/login", async (req, res) => {
     try {
 
         const loginResult = await business.checkLogin(email, password)
-
-        if (!loginResult) {
-            return res.redirect(`/login?message=${encodeURIComponent(loginResult.message)}&type=error`)
-        }
 
         if (!loginResult.isValid) {
             return res.redirect(`/login?message=${encodeURIComponent(loginResult.message)}&type=error`)

@@ -107,7 +107,7 @@ async function getUserByVerificationKey(verificationKey) {
 async function sendVerificationEmail(email, username) {
     const verificationKey = crypto.randomUUID()
     await persistence.storeKey(email, verificationKey, "verification")
-    const verificationLink = `http://localhost:8000/login?key=${verificationKey}`
+    const verificationLink = `http://localhost:8000/verify-email?key=${verificationKey}`
     const body = `
         <p>Hello, ${username},</p>
         <p>Welcome to GlobeLingo! Please click on this link to verify your email address:</p>
@@ -150,7 +150,12 @@ async function checkLogin(email, password) {
         const hash = crypto.createHash('sha1')
         hash.update(storedSalt + password) 
         const inputHash = hash.digest('hex')
-        return inputHash === storedHash
+
+        if (inputHash === storedHash) {
+            return { isValid: true, message: "Login successful." }
+        } else {
+            return { isValid: false, message: "Invalid email or password." }
+        }
     }
     catch (error) {
         console.error('Error during login check:', error)
