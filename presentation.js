@@ -72,7 +72,8 @@ app.post("/sign-up", async (req, res) => {
         }
 
         await business.createUser(username, email, password, knownLanguagesArray, learningLanguagesArray, profilePicturePath)
-        res.redirect(`/login?message=${encodeURIComponent("Registration successful. Please log in with your credentials.")}&type=success`)
+        await business.sendVerificationEmail(email, username)
+        res.redirect(`/login?message=${encodeURIComponent("Registration successful. A verification email has been sent to your inbox. Please verify your email to log in.")}&type=success`)
 
     }
 
@@ -83,6 +84,23 @@ app.post("/sign-up", async (req, res) => {
 
     }
 })
+
+app.get("/verify-email", async (req, res) => {
+    const { key } = req.query
+
+    try {
+
+        await business.verifyEmail(key)
+        res.redirect(`/login?message=${encodeURIComponent("Your email has been verified successfully. Please log in with your credentials.")}&type=success`)
+
+    } catch (error) {
+
+        console.error("Email verification error:", error.message);
+        res.redirect(`/login?message=${encodeURIComponent(error.message)}&type=error`)
+    
+    }
+})
+
 
 app.get("/login", (req, res) => {
     const message = req.query.message
@@ -95,10 +113,14 @@ app.post("/login", async (req, res) => {
 
     try {
 
-        const isValidLogin = await business.checkLogin(email, password)
+        const loginResult = await business.checkLogin(email, password)
 
-        if (!isValidLogin) {
-            return res.redirect(`/login?message=${encodeURIComponent("Invalid email or password.")}&type=error`)
+        if (!loginResult) {
+            return res.redirect(`/login?message=${encodeURIComponent(loginResult.message)}&type=error`)
+        }
+
+        if (!loginResult.isValid) {
+            return res.redirect(`/login?message=${encodeURIComponent(loginResult.message)}&type=error`)
         }
 
         const sessionKey = await business.startSession()
@@ -108,7 +130,7 @@ app.post("/login", async (req, res) => {
     } catch (error) {
 
         console.error("Login error:", error.message)
-        res.redirect("/login?message=" + encodeURIComponent(error.message))
+        res.redirect("/login?message=" + encodeURIComponent("An unexpected error occurred. Please try again."))
 
     }
 })
@@ -123,11 +145,11 @@ app.get("/logout", async (req, res) => {
             res.clearCookie("sessionKey")
         }
 
-        res.redirect("/login?message=" + encodeURIComponent("You have been logged out. Please login again!"))
+        res.redirect("/login?message=" + encodeURIComponent("You have been logged out."))
     } catch (error) {
 
         console.error("Logout error:", error.message)
-        res.redirect("/dashboard?message=" + encodeURIComponent("An error occurred while logging out."))
+        res.redirect("/dashboard?message=" + encodeURIComponent("An unexpected error occurred. Please try again."))
 
     }
 })

@@ -19,6 +19,22 @@ async function connectDatabase() {
     }
 }
 
+async function updateUserField(email, updates) {
+    try {
+        await connectDatabase()
+        const result = await users.updateOne(
+            { email: email }, 
+            { $set: updates })
+        if (result.modifiedCount > 0) {
+            console.log(`User with email ${email} updated successfully.`)
+        } else {
+            console.log(`No updates were made for user with email ${email}.`)
+        }
+    } catch (error) {
+        console.error("Error updating user field:", error)
+    }
+}
+
 async function saveSession(session) {
     try {
         await connectDatabase()
@@ -95,34 +111,45 @@ async function createUser(user) {
     }
 }
 
-async function storeResetKey(email, resetKey) {
-    await connectDatabase()
-    const expiry = new Date(Date.now() + 5 * 60 * 1000)
-    const resetKeyObject = {
-        value: resetKey,
-        expiry: expiry
+async function storeKey(email, key, type) {
+    try {
+        await connectDatabase()
+        const expiry = new Date(Date.now() + 5 * 60 * 1000)
+        const keyObject = { value: key, expiry}
+        await users.updateOne(
+            { email },
+            { $set: { [`${type}Key`]: keyObject } }
+        )
+        console.log(`${type} key stored successfully.`)
+    } catch (error) {
+        console.error(`Error storing ${type} key:`, error)
     }
-    await users.updateOne(
-        { email: email },
-        { $set: { resetKey: resetKeyObject} }
-    )
 }
 
-async function getUserByResetKey(resetKey) {
-    await connectDatabase()
-    const user = await users.findOne({ "resetKey.value": resetKey })
-    if (user && user.resetKey.expiry > new Date()) {
-        return user
+async function getUserByKey(key, type) {
+    try {
+        await connectDatabase()
+        const user = await users.findOne({ [`${type}Key.value`]: key })
+        if (user && user[`${type}Key`].expiry > new Date()) {
+            return user;
+        }
+        return null
+    } catch (error) {
+        console.error(`Error fetching user by ${type} key:`, error)
+        return null
     }
-    return null
 }
 
-async function clearResetKey(email) {
-    await connectDatabase()
-    await users.updateOne(
-        { email: email },
-        { $unset: { resetKey: "" } }
-    )
+async function clearKey(email, type) {
+    try {
+        await connectDatabase()
+        await users.updateOne(
+            { email },
+            { $unset: { [`${type}Key`]: "" } })
+        console.log(`${type} key cleared successfully.`)
+    } catch (error) {
+        console.error(`Error clearing ${type} key:`, error)
+    }
 }
 
 async function updatePassword(email, newPassword) {
@@ -267,10 +294,11 @@ async function initializeBadges() {
 }
 
 module.exports = {
+    updateUserField,
     saveSession, getSession, deleteSession, updateSession,
     getUserByUsername, getUserByEmail,
     createUser,
-    storeResetKey, getUserByResetKey, clearResetKey, updatePassword,
+    storeKey, getUserByKey, clearKey, updatePassword,
     addContact, removeContact, getContactList,
     getAllBadges, getUserBadges, awardBadge
 }
