@@ -26,20 +26,6 @@ async function deleteSession(key) {
     return await persistence.deleteSession(key)
 }
 
-async function generateFormToken(key) {
-    let token = crypto.randomUUID()
-    let sessionData = await persistence.getSession(key)
-    sessionData.csrfToken = token
-    await persistence.updateSession(key, sessionData)
-    return token
-}
-
-async function cancelToken(key) {
-    let sessionData = await persistence.getSession(key)
-    delete sessionData.csrfToken
-    await persistence.updateSession(key, sessionData)
-}
-
 async function getUserByEmail(email) {
     return await persistence.getUserByEmail(email)
 }
@@ -108,37 +94,82 @@ async function createUser(username, email, password, knownLanguages, learningLan
             knownLanguages: knownLanguages,
             learningLanguages: learningLanguages,
             profilePicturePath: profilePicturePath,
+            isVerified: false
         }
         await persistence.createUser(user)
     } 
+}
+
+async function getUserByVerificationKey(verificationKey) {
+    return await persistence.getUserByKey(verificationKey, "verification")
+}
+
+async function sendVerificationEmail(email, username) {
+    const verificationKey = crypto.randomUUID()
+    await persistence.storeKey(email, verificationKey, "verification")
+    const verificationLink = `http://localhost:8000/verify-email?key=${verificationKey}`
+    const body = `
+        <p>Hello, ${username},</p>
+        <p>Welcome to GlobeLingo! Please click on this link to verify your email address:</p>
+        <a href="${verificationLink}">${verificationLink}</a>
+        <p>If you did not sign up, please ignore this email.</p>
+    `
+    await transporter.sendMail({
+        from: 'no-reply@globelingo.com',
+        to: email,
+        subject: 'Email Verification',
+        html: body,
+    })
+}
+
+async function verifyEmail(key) {
+    try {
+        const user = await persistence.getUserByKey(key, "verification")
+        if (!user) throw new Error("Verification failed. The link may have expired or is invalid.")
+
+        await persistence.updateUserField(user.email, { isVerified: true })
+
+        await persistence.clearKey(user.email, "verification")
+
+        console.log(`Email verified for user: ${user.username}`)
+    } catch (error) {
+        console.error("Error during email verification:", error.message)
+    }
 }
 
 async function checkLogin(email, password) {
     try {
         const user = await persistence.getUserByEmail(email)
         if (!user) {
-            return false
+            return { isValid: false, message: "Invalid email or password." }
+        }
+        if (!user.isVerified) {
+            return { isValid: false, message: "Email is not verified. Please verify your email before logging in." }
         }
         const [storedSalt, storedHash] = user.password.split(':')
         const hash = crypto.createHash('sha1')
         hash.update(storedSalt + password) 
         const inputHash = hash.digest('hex')
-        return inputHash === storedHash
+
+        if (inputHash === storedHash) {
+            return { isValid: true, message: "Login successful." }
+        } else {
+            return { isValid: false, message: "Invalid email or password." }
+        }
     }
     catch (error) {
         console.error('Error during login check:', error)
-        return false
     }
 }
 
 async function storeResetKey(email) {
     let resetKey = crypto.randomUUID();
-    await persistence.storeResetKey(email, resetKey)
+    await persistence.storeKey(email, resetKey, "reset")
     return resetKey
 }
 
 async function getUserByResetKey(resetKey) {
-    return await persistence.getUserByResetKey(resetKey)
+    return await persistence.getUserByKey(resetKey, "reset")
 }
 
 async function sendPasswordResetEmail(email, resetKey) {
@@ -150,7 +181,7 @@ async function sendPasswordResetEmail(email, resetKey) {
     <p>If you did not request a password reset, please ignore this email.</p>
     `;
     await transporter.sendMail({
-        from: 'no-reply@INFS3201.com',
+        from: 'no-reply@globelingo.com',
         to: email,
         subject: 'Password Reset Request',
         html: body,
@@ -164,13 +195,13 @@ async function resetPassword(resetKey, newPassword, confirmedPassword) {
     if (newPassword.trim() !== confirmedPassword.trim()) {
         return {isValid: false, message: "The passwords you entered do not match. Please ensure both password fields are the same."}
     }
-    const user = await persistence.getUserByResetKey(resetKey)
+    const user = await persistence.getUserByKey(resetKey, "reset")
     if (!user) {
         return { isValid: false, message: "Your reset link is invalid or has expired. Please request a new link."}
     }
     const saltedHash = createSaltedHash(newPassword)
     await persistence.updatePassword(user.email, saltedHash)
-    await persistence.clearResetKey(user.email)
+    await persistence.clearKey(email, "reset")
     return { isValid: true}
 }
 
@@ -210,13 +241,55 @@ async function awardBadge(userId) {
     }
 }
 
+async function addContact(userId, contactId) {
+    try {
+       
+        const contactProfile = await persistence.getUserProfile(contactId);
+        if (!contactProfile) {
+            throw new Error("Contact not found.");
+        }
+
+       
+        if (contactProfile.blockedBy) {
+            for (const blockedUserId of contactProfile.blockedBy) {
+                if (blockedUserId === userId) {
+                    throw new Error("You cannot add a user who has blocked you.");
+                }
+            }
+        }
+
+       
+        await persistence.addContact(userId, contactId);
+        console.log(`Successfully added contact ${contactId} for user ${userId}`);
+    } catch (error) {
+        console.error("Error in business layer (addContact):", error.message);
+        throw error;
+    }
+}
+
+async function generateFormToken(key) {
+    let token = crypto.randomUUID()
+    let sessionData = await persistence.getSession(key)
+    sessionData.csrfToken = token
+    await persistence.updateSession(key, sessionData)
+    return token
+}
+
+async function cancelToken(key) {
+    let sessionData = await persistence.getSession(key)
+    delete sessionData.csrfToken
+    await persistence.updateSession(key, sessionData)
+}
+
 module.exports = {
     startSession, getSession, deleteSession,
-    generateFormToken, cancelToken,
     getUserByEmail,
-    validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture,
+    validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture, 
+    getUserByVerificationKey, sendVerificationEmail, verifyEmail,
     createUser,
     checkLogin,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
-    awardBadge
+    awardBadge, addContact,
+    generateFormToken, cancelToken
+
 }
