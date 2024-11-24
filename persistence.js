@@ -141,52 +141,46 @@ async function updatePassword(email, newPassword) {
 
 async function addContact(userId, contactId) {
     try {
-        await connectDatabase();
+        await connectDatabase()
         await users.updateOne(
             { _id: new mongodb.ObjectId(userId) },
             { $addToSet: { contacts: contactId } } 
-        );
-        console.log(`Contact ${contactId} added to user ${userId}'s contact list.`);
+        )
+        console.log(`Contact ${contactId} added to user ${userId}'s contact list.`)
     } catch (error) {
-        console.error("Error adding contact:", error);
-        throw error; 
+        console.error("Error adding contact:", error)
     }
 }
 
 async function removeContact(userId, contactId) {
     try {
-        await connectDatabase();
+        await connectDatabase()
         await users.updateOne(
             { _id: new mongodb.ObjectId(userId) },
             { $pull: { contacts: contactId } }
         );
-        console.log(`Contact ${contactId} removed from user ${userId}'s contact list.`);
+        console.log(`Contact ${contactId} removed from user ${userId}'s contact list.`)
     } catch (error) {
-        console.error("Error removing contact:", error);
-        throw error; 
+        console.error("Error removing contact:", error)
     }
 }
 
-async function getContacts(userId) {
+async function getContactList(userId) {
     try {
         await connectDatabase();
         const user = await users.findOne(
             { _id: new mongodb.ObjectId(userId) },
             { projection: { contacts: 1 } } 
-        );
-
+        )
         if (user) {
             if (user.contacts) {
-                return user.contacts; 
-            } else {
-                return []; 
+                return user.contacts
             }
-        } else {
-            return []; 
-        }
+            return []
+        } 
+        return []   
     } catch (error) {
-        console.error("Error retrieving contacts:", error);
-        throw error; 
+        console.error("Error retrieving contacts:", error)
     }
 }
 
@@ -277,6 +271,6 @@ module.exports = {
     getUserByUsername, getUserByEmail,
     createUser,
     storeResetKey, getUserByResetKey, clearResetKey, updatePassword,
-    addContact, removeContact, getContacts,
+    addContact, removeContact, getContactList,
     getAllBadges, getUserBadges, awardBadge
 }
