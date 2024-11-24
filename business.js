@@ -210,6 +210,32 @@ async function awardBadge(userId) {
     }
 }
 
+async function addContact(userId, contactId) {
+    try {
+       
+        const contactProfile = await persistence.getUserProfile(contactId);
+        if (!contactProfile) {
+            throw new Error("Contact not found.");
+        }
+
+       
+        if (contactProfile.blockedBy) {
+            for (const blockedUserId of contactProfile.blockedBy) {
+                if (blockedUserId === userId) {
+                    throw new Error("You cannot add a user who has blocked you.");
+                }
+            }
+        }
+
+       
+        await persistence.addContact(userId, contactId);
+        console.log(`Successfully added contact ${contactId} for user ${userId}`);
+    } catch (error) {
+        console.error("Error in business layer (addContact):", error.message);
+        throw error;
+    }
+}
+
 module.exports = {
     startSession, getSession, deleteSession,
     generateFormToken, cancelToken,
@@ -218,5 +244,6 @@ module.exports = {
     createUser,
     checkLogin,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
-    awardBadge
+    awardBadge, addContact
+
 }
