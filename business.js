@@ -183,6 +183,33 @@ async function updatePassword(email, newPassword) {
     await persistence.updatePassword(email, saltedHash)
 }
 
+async function awardBadge(userId) {
+    try {
+        const allBadges = await persistence.getAllBadges()
+        const userMessages = await persistence.getUserMessages(userId)
+        const badgeRules = {
+            "First Conversation": async () => {
+                return userMessages.some(msg => msg.repliedTo)
+            },
+            "100 Messages Sent": async () => {
+                return userMessages.length >= 100
+            }
+        }
+
+        for (const badge of allBadges) {
+            const userBadges = await persistence.getUserBadges(userId)
+            if (userBadges.some(b => b.name === badge.name)) continue
+
+            const isEligible = await badgeRules[badge.name]?.()
+            if (isEligible) {
+                await persistence.awardBadge(userId, badge)
+            }
+        }
+    } catch (error) {
+        console.error("Error in badge awarding process:", error)
+    }
+}
+
 module.exports = {
     startSession, getSession, deleteSession,
     generateFormToken, cancelToken,
@@ -190,5 +217,6 @@ module.exports = {
     validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture,
     createUser,
     checkLogin,
-    storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword
+    storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
+    awardBadge
 }
