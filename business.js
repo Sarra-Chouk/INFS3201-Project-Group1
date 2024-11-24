@@ -280,7 +280,7 @@ module.exports = {
     startSession, getSession, deleteSession,
     getUserByEmail,
     validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture, 
-    storeVerificationKey, getUserByVerificationKey, sendVerificationEmail, verifyEmail,
+    getUserByVerificationKey, sendVerificationEmail, verifyEmail,
     createUser,
     checkLogin,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
