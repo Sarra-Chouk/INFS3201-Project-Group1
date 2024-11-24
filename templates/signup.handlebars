@@ -8,12 +8,17 @@
     .form-check {
         margin-bottom: 8px;
     }
+
+    .form-label {
+        display: block;
+        text-align: left;
+    }
 </style>
 
 <body class="bg-light d-flex flex-column min-vh-100">
-    <div class="bg-light min-vh-100 d-flex flex-row align-items-center">
+    <div class="bg-light min-vh-100 d-flex flex-row">
         <div class="container">
-            <div class="row justify-content-center">
+            <div class="row">
                 <div class="col-lg-12">
                     <div class="card mb-4 mt-4" style="min-width: 500px;">
                         <div class="card-body p-4">
@@ -26,29 +31,45 @@
                             <form action="/sign-up" method="POST" enctype="multipart/form-data">
                                 <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
                                 <div class="mb-3">
-                                    <label for="username" class="form-label">Username</label>
+                                    <label for="username" class="form-label left-align">Username</label>
                                     <input class="form-control" type="text" id="username" name="username"
                                         placeholder="Enter your username" value="{{username}}" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="email" class="form-label">Email</label>
+                                    <label for="email" class="form-label left-align">Email</label>
                                     <input class="form-control" type="text" id="email" name="email"
                                         placeholder="Enter your email" value="{{email}}" required>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="password" class="form-label">Password</label>
-                                    <input class="form-control" type="password" id="password" name="password"
-                                        placeholder="Enter your password" required>
+                                    <label for="password" class="form-label left-align">Password</label>
+
+                                    <div class="input-group mb-4">
+
+                                        <span class="input-group-text">
+                                            <i class="bi bi-eye-slash" id="togglePassword"></i>
+                                        </span>
+                                        <input class="form-control" type="password" name="password"
+                                            placeholder="Enter your password" id="password" required>
+                                    </div>
                                 </div>
                                 <div class="mb-3">
-                                    <label for="confirmedPassword" class="form-label">Confirm Password</label>
-                                    <input class="form-control" type="password" id="confirmedPassword"
-                                        name="confirmedPassword" placeholder="Repeat your password" required>
+                                    <label for="confirmedPassword" class="form-label left-align">Confirm
+                                        Password</label>
+
+                                    <div class="input-group mb-4">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-eye-slash" id="toggleConfirmedPassword"></i>
+                                        </span>
+
+                                        <input class="form-control" type="password" id="confirmedPassword"
+                                            name="confirmedPassword" placeholder="Repeat your password" required>
+                                    </div>
                                 </div>
 
                                 <!-- Languages You Speak Fluently -->
                                 <div class="mb-3">
-                                    <label for="knownLanguages" class="form-label">Languages You Speak Fluently</label>
+                                    <label for="knownLanguages" class="form-label left-align">Languages You Speak
+                                        Fluently</label>
                                     <div class="dropdown">
                                         <button class="btn btn-primary dropdown-toggle w-100" type="button"
                                             id="dropdownMenuKnownLanguages" data-bs-toggle="dropdown"
@@ -121,7 +142,8 @@
 
                                 <!-- Languages You Would Like to Learn -->
                                 <div class="mb-3">
-                                    <label for="learningLanguages" class="form-label">Languages You Would Like to
+                                    <label for="learningLanguages" class="form-label left-align">Languages You Would
+                                        Like to
                                         Learn</label>
                                     <div class="dropdown">
                                         <button class="btn btn-primary dropdown-toggle w-100" type="button"
@@ -196,7 +218,8 @@
 
                                 <!-- Profile Picture Upload -->
                                 <div class="mb-3">
-                                    <label for="profilePicture" class="form-label">Profile Picture</label>
+                                    <label for="profilePicture" class="form-label left-align">Profile
+                                        Picture</label>
                                     <input class="form-control" type="file" id="profilePicture" name="profilePicture"
                                         accept="image/*">
                                 </div>
@@ -211,4 +234,34 @@
             </div>
         </div>
     </div>
+
+    <script>
+        const togglePassword = document.querySelector('#togglePassword');
+        const password = document.querySelector('#password');
+
+        togglePassword.addEventListener('click', () => {
+            // Toggle the type attribute
+            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+            password.setAttribute('type', type);
+
+            // Toggle the eye icon class
+            togglePassword.classList.toggle('bi-eye');
+            togglePassword.classList.toggle('bi-eye-slash');
+        });
+
+        const toggleConfirmedPassword = document.querySelector('#toggleConfirmedPassword');
+        const confirmedPassword = document.querySelector('#confirmedPassword');
+
+        toggleConfirmedPassword.addEventListener('click', () => {
+            // Toggle the type attribute
+            const type2 = confirmedPassword.getAttribute('type') === 'password' ? 'text' : 'password';
+            confirmedPassword.setAttribute('type', type2);
+
+            // Toggle the eye icon class
+            toggleConfirmedPassword.classList.toggle('bi-eye');
+            toggleConfirmedPassword.classList.toggle('bi-eye-slash');
+        });
+
+    </script>
+
 </body>
