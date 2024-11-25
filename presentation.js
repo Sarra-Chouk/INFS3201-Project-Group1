@@ -61,10 +61,6 @@ app.get("/blocked-contacts", (req, res) => {
     res.render("blockedContacts")
 })
 
-app.get("/badges", (req, res) => {
-    res.render("badges")
-})
-
 app.get("/", (req, res) => {
     res.render("index")
 })
@@ -210,8 +206,19 @@ app.get("/logout", async (req, res) => {
     }
 })
 
-app.get("/dashboard", async (req, res) => {
-    res.send("Coming Soon...")
+app.get("/badges/:userId", async (req, res) => {
+    const userId  = req.params
+    try {
+        const userBadges = await persistence.getUserBadges(userId)
+
+        if (userBadges.length === 0) {
+            return res.render("badges", { message: "You have not earned any badges yet." })
+        }
+        res.render("badges", { badges: userBadges })
+    } catch (error) {
+        console.error("Error fetching badges:", error.message)
+        res.redirect(`/dashboard?message=${encodeURIComponent("An error occurred while retrieving the badges.")}&type=error`)
+    }
 })
 
 app.get("/reset-password", async (req, res) => {
@@ -284,25 +291,6 @@ app.post("/update-password", async (req, res) => {
         res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent("An unexpected error occurred. Please try again.")}&type=error`)
 
     } 
-})
-
-app.get("/user/:userId/badges", async (req, res) => {
-    const { userId } = req.params
-
-    try {
-
-        const badges = await persistence.getUserBadges(userId)
-
-        if (badges.length === 0) {
-            return res.render("badges", { message: "No badges found." })
-        }
-        res.render("badges", { badges })
-
-    } catch (error) {
-
-        console.error("Error fetching user badges:", error.message)
-
-    }
 })
 
 app.listen(8000, () => { })

@@ -17,8 +17,8 @@
                     <div class="card col-md-8 p-5 mb-0 fixed">
                         <div class="card-body">
                             {{#if message}}
-                            <div class="alert text-center {{#ifEquals type "
-                                success"}}alert-success{{else}}alert-danger{{/ifEquals}}">
+                            <div class="alert text-center {{#ifEquals type 
+                                'success'}}alert-success{{else}}alert-danger{{/ifEquals}}">
                                 {{message}}
                             </div>
                             {{/if}}
