@@ -9,7 +9,7 @@ let transporter = nodemailer.createTransport({
 
 async function startSession(userId) {
     const uuid = crypto.randomUUID()
-    const expiry = new Date(Date.now() + 5 * 60 * 1000)
+    const expiry = new Date(Date.now() + 10 * 60 * 1000)
     const session = {
         sessionKey: uuid,
         expiry: expiry,
@@ -202,7 +202,7 @@ async function resetPassword(resetKey, newPassword, confirmedPassword) {
     }
     const saltedHash = createSaltedHash(newPassword)
     await persistence.updatePassword(user.email, saltedHash)
-    await persistence.clearKey(email, "reset")
+    await persistence.clearKey(user.email, "reset")
     return { isValid: true}
 }
 
