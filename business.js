@@ -301,6 +301,32 @@ async function getConversation(userId1, userId2) {
     return await persistence.getConversation(userId1, userId2)
 }
 
+async function getProfile(userId) {
+    try {
+        // Fetch user information from persistence layer
+        const user = await persistence.getUserById(userId); 
+        if (!user) {
+            throw new Error("User not found.");
+        }
+
+        // Fetch badges associated with the user
+        const badges = await persistence.getUserBadges(userId);
+
+        // Return profile details
+        return {
+            username: user.username,
+            email: user.email,
+            profilePicture: user.profilePicturePath || "/images/defaultProfilePicture.jpg",
+            badges: badges || []
+        };
+    } catch (error) {
+        console.error("Error fetching profile:", error.message);
+        throw error;
+    }
+}
+
+
+
 module.exports = {
     getUserByEmail,
     validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture, 
@@ -313,5 +339,5 @@ module.exports = {
     addContact, getContacts,
     getUserBadges, awardBadge, 
     generateFormToken, cancelToken,
-    sendMessage, getConversation
+    sendMessage, getConversation, getProfile
 }

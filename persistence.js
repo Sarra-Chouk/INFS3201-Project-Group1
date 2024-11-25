@@ -337,6 +337,22 @@ async function getConversation(userId1, userId2) {
         .toArray()
 }
 
+async function getUserById(userId) {
+    try {
+        await connectDatabase();
+        const user = await users.findOne(
+            { _id: new mongodb.ObjectId(userId) },
+            { projection: { username: 1, email: 1, profilePicturePath: 1 } } 
+        );
+        return user;
+    } catch (error) {
+        console.error("Error fetching user by ID:", error.message);
+        throw error;
+    }
+}
+
+
+
 module.exports = {
     updateUserField,
     getUserByUsername, getUserByEmail,
@@ -347,5 +363,5 @@ module.exports = {
     getMatchingUsers,
     addContact, removeContact, getContacts,
     getAllBadges, getUserBadges, awardBadge,
-    saveMessage, getConversation
+    saveMessage, getConversation, getUserById
 }
