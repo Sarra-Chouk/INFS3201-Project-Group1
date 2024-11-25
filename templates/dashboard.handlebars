@@ -44,7 +44,32 @@
 
   <div class="body flex-grow-1 px-3">
     <div class="container-lg">
-      <h1>Dashboard</h1>
+      <table class="table table-striped my-4 justify-content-center text-center">
+        <thead>
+          <tr>
+            <th scope="col">Username</th>
+            <th scope="col">Profile Picture</th>
+            <th scope="col">Known Languages</th>
+            <th scope="col">Learning Languages</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {{#each matchingUsers}}
+          <tr>
+            <td>{{this.username}}</td>
+            <td><img src="{{this.profilePicture}}" alt="{{this.username}}" class="profile-picture">
+            </td>
+            <td>{{#each this.knownLanguages}}{{this}}, {{/each}}</td>
+            <td>{{#each this.learningLanguages}}{{this}}, {{/each}}</td>
+            <td>
+              <button class="btn btn-success btn-sm">Add Contact</button>
+              <button class="btn btn-danger btn-sm">Block Contact</button>
+            </td>
+          </tr>
+          {{/each}}
+        </tbody>
+      </table>
     </div>
   </div>
 

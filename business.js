@@ -281,6 +281,10 @@ async function cancelToken(key) {
     await persistence.updateSession(key, sessionData)
 }
 
+async function getMatchingUsers(username){
+    return await persistence.getMatchingUsers(username)
+}
+
 
 module.exports = {
     startSession, getSession, deleteSession,
@@ -292,5 +296,5 @@ module.exports = {
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
     awardBadge, addContact,
     generateFormToken, cancelToken,
-
+    getMatchingUsers
 }

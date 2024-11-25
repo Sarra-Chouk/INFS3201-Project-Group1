@@ -23,8 +23,18 @@ app.use('/images', express.static(__dirname + "/static/profilePictures"))
 app.use(fileUpload())
 
 
-app.get('/dashboard', async (req, res) => {
-    res.render("dashboard")
+app.get('/dashboard/:username', async (req, res) => {
+    const username = req.params.username; 
+
+    try {
+      const matchingUsers = await business.getMatchingUsers(username);
+  
+      res.render('dashboard', {
+        matchingUsers,
+      });
+    } catch (err) {
+      res.status(500).send('Error fetching data');
+    }
 })
 
 app.get("/profile", (req, res) => {

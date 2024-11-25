@@ -293,6 +293,24 @@ async function initializeBadges() {
     }
 }
 
+async function getMatchingUsers(username){
+
+    await connectDatabase()
+
+    let user = await getUserByUsername(username)
+    let learningLanguages = user.learningLanguages
+
+    const matchingUsers = await users.find(
+        {
+          knownLanguages: { $in: learningLanguages },
+          username: { $ne: username }
+        }
+      ).toArray();
+      console.log(matchingUsers)
+      return matchingUsers
+}
+
+
 module.exports = {
     updateUserField,
     saveSession, getSession, deleteSession, updateSession,
@@ -301,4 +319,5 @@ module.exports = {
     storeKey, getUserByKey, clearKey, updatePassword,
     addContact, removeContact, getContactList,
     getAllBadges, getUserBadges, awardBadge, 
+    getMatchingUsers
 }
