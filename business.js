@@ -294,6 +294,31 @@ async function getContacts(userId){
     return await persistence.getContacts(userId)
 }
 
+async function getProfile(userId) {
+    try {
+        // Fetch user information from persistence layer
+        const user = await persistence.getUserById(userId); 
+        if (!user) {
+            throw new Error("User not found.");
+        }
+
+        // Fetch badges associated with the user
+        const badges = await persistence.getUserBadges(userId);
+
+        // Return profile details
+        return {
+            username: user.username,
+            email: user.email,
+            profilePicture: user.profilePicturePath || "/images/defaultProfilePicture.jpg",
+            badges: badges || []
+        };
+    } catch (error) {
+        console.error("Error fetching profile:", error.message);
+        throw error;
+    }
+}
+
+
 
 module.exports = {
     startSession, getSession, deleteSession,
@@ -306,5 +331,5 @@ module.exports = {
     getUserBadges, awardBadge, 
     addContact, getContacts,
     generateFormToken, cancelToken,
-    getMatchingUsers
+    getMatchingUsers, getProfile
 }

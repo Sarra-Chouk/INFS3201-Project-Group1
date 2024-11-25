@@ -41,9 +41,26 @@ app.get("/dashboard", attachSessionData, async (req, res) => {
     }
 })
 
-app.get("/profile", (req, res) => {
-    res.render("profile")
-})
+app.get("/profile", attachSessionData, async (req, res) => {
+    try {
+        const userId = req.userId;
+
+        const profile = await business.getProfile(userId);
+
+        
+        res.render("profile", {
+            username: profile.username,
+            email: profile.email,
+            profilePicture: profile.profilePicture,
+            badges: profile.badges
+        });
+    } catch (error) {
+        console.error("Error rendering profile:", error.message);
+        res.status(500).send("An error occurred while loading your profile.");
+    }
+});
+
+
 
 app.get("/my-contacts/:userId", async (req, res) => {
     const userId = req.params.userId; 

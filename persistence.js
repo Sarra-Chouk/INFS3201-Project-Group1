@@ -315,6 +315,21 @@ async function getMatchingUsers(userId){
       return matchingUsers
 }
 
+async function getUserById(userId) {
+    try {
+        await connectDatabase();
+        const user = await users.findOne(
+            { _id: new mongodb.ObjectId(userId) },
+            { projection: { username: 1, email: 1, profilePicturePath: 1 } } 
+        );
+        return user;
+    } catch (error) {
+        console.error("Error fetching user by ID:", error.message);
+        throw error;
+    }
+}
+
+
 
 module.exports = {
     updateUserField,
@@ -324,5 +339,5 @@ module.exports = {
     storeKey, getUserByKey, clearKey, updatePassword,
     addContact, removeContact, getContacts,
     getAllBadges, getUserBadges, awardBadge, 
-    getMatchingUsers
+    getMatchingUsers, getUserById
 }
