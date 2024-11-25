@@ -192,7 +192,7 @@ async function removeContact(userId, contactId) {
     }
 }
 
-async function getContactList(userId) {
+async function getContacts(userId) {
     try {
         await connectDatabase();
         const user = await users.findOne(
@@ -293,6 +293,7 @@ async function initializeBadges() {
     }
 }
 
+
 async function getMatchingUsers(username){
 
     await connectDatabase()
@@ -317,7 +318,7 @@ module.exports = {
     getUserByUsername, getUserByEmail,
     createUser,
     storeKey, getUserByKey, clearKey, updatePassword,
-    addContact, removeContact, getContactList,
+    addContact, removeContact, getContacts,
     getAllBadges, getUserBadges, awardBadge, 
     getMatchingUsers
 }

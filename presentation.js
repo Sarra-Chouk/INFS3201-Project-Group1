@@ -43,8 +43,18 @@ app.get("/profile", (req, res) => {
     res.render("profile")
 })
 
-app.get("/my-contacts", (req, res) => {
-    res.render("myContacts")
+app.get("/my-contacts/:userId", async (req, res) => {
+    const userId = req.params.userId; 
+
+    try {
+      const contacts = await business.getContacts(userId);
+  
+      res.render('dashboard', {
+        contacts,
+      });
+    } catch (err) {
+      res.status(500).send('Error fetching data');
+    }
 })
 
 app.get("/blocked-contacts", (req, res) => {
@@ -171,7 +181,7 @@ app.post("/login", async (req, res) => {
 
         const sessionKey = await business.startSession()
         res.cookie("sessionKey", sessionKey, { httpOnly: true })
-        res.redirect("/dashboard")
+        res.redirect("/dashboard/"+ loginResult.userId)
 
     } catch (error) {
 
