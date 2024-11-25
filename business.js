@@ -86,7 +86,7 @@ function createSaltedHash(password) {
 
 async function createUser(username, email, password, knownLanguages, learningLanguages, profilePicturePath) {
     const hashedPassword = createSaltedHash(password) 
-    if (await validateEmail && await validateUsername && await validatePassword) {
+    if (await validateEmail && await validateUsername && await validatePassword && await checkEmailExists) {
         const user = {
             username: username,
             email: email,

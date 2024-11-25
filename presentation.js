@@ -67,8 +67,18 @@ app.get("/sign-up", async (req, res) => {
 app.post("/sign-up", async (req, res) => {
     const { username, email, password, confirmedPassword, knownLanguages, learningLanguages } = req.body
     const profilePicture = req.files ? req.files.profilePicture : null
-    const knownLanguagesArray = Array.isArray(knownLanguages) ? knownLanguages : [knownLanguages]
-    const learningLanguagesArray = Array.isArray(learningLanguages) ? learningLanguages : [learningLanguages]
+
+     const knownLanguagesArray = knownLanguages
+        ? Array.isArray(knownLanguages)
+            ? knownLanguages.filter((lang) => lang && lang.trim() !== "")
+            : [knownLanguages].filter((lang) => lang && lang.trim() !== "")
+        : []
+
+    const learningLanguagesArray = learningLanguages
+        ? Array.isArray(learningLanguages)
+            ? learningLanguages.filter((lang) => lang && lang.trim() !== "")
+            : [learningLanguages].filter((lang) => lang && lang.trim() !== "")
+        : []
 
     try {
 
@@ -91,6 +101,14 @@ app.post("/sign-up", async (req, res) => {
 
         if (isUsernameValid) {
             throw new Error("Username is already taken. Please choose a different one.")
+        }
+
+        if (knownLanguagesArray.length === 0) {
+            throw new Error("Please select at least one language you speak fluently.")
+        }
+
+        if (learningLanguagesArray.length === 0) {
+            throw new Error("Please select at least one language you would like to learn.")
         }
 
         if (!isProfilePictureValid.isValid) {
