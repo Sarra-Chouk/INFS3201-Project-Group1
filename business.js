@@ -7,12 +7,13 @@ let transporter = nodemailer.createTransport({
     port: 25,
 })
 
-async function startSession() {
+async function startSession(userId) {
     const uuid = crypto.randomUUID()
     const expiry = new Date(Date.now() + 5 * 60 * 1000)
     const session = {
         sessionKey: uuid,
         expiry: expiry,
+        data: { userId: userId }
     }
     await persistence.saveSession(session)
     return uuid
@@ -152,7 +153,7 @@ async function checkLogin(email, password) {
         const inputHash = hash.digest('hex')
 
         if (inputHash === storedHash) {
-            return { isValid: true, message: "Login successful.", userId:user.userId }
+            return { isValid: true, message: "Login successful.",  userId: user._id }
         } else {
             return { isValid: false, message: "Invalid email or password." }
         }
@@ -212,6 +213,10 @@ async function updatePassword(email, newPassword) {
     }
     const saltedHash = createSaltedHash(newPassword)
     await persistence.updatePassword(email, saltedHash)
+}
+
+async function getUserBadges(userId) {
+    return await persistence.getUserBadges(userId)
 }
 
 async function awardBadge(userId) {
@@ -281,8 +286,8 @@ async function cancelToken(key) {
     await persistence.updateSession(key, sessionData)
 }
 
-async function getMatchingUsers(username){
-    return await persistence.getMatchingUsers(username)
+async function getMatchingUsers(userId){
+    return await persistence.getMatchingUsers(userId)
 }
 
 async function getContacts(userId){
@@ -298,7 +303,8 @@ module.exports = {
     createUser,
     checkLogin,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
-    awardBadge, addContact, getContacts,
+    getUserBadges, awardBadge, 
+    addContact, getContacts,
     generateFormToken, cancelToken,
     getMatchingUsers
 }

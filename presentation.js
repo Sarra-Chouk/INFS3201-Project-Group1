@@ -20,22 +20,24 @@ app.engine("handlebars", hbs.engine)
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
 app.use('/images', express.static(__dirname + "/static/profilePictures"))
+app.use('/badges', express.static(__dirname + '/static/badges'))
 app.use(fileUpload())
 
-
-//session stuff are not implemented yet
-//sending the username in the route is not implemented yet
-app.get('/dashboard/:username', async (req, res) => {
-    const username = req.params.username; 
-
+app.get("/dashboard", attachSessionData, async (req, res) => {
     try {
-      const matchingUsers = await business.getMatchingUsers(username);
-  
-      res.render('dashboard', {
-        matchingUsers,
-      });
+
+        const userId = req.userId
+        const matchingUsers = await business.getMatchingUsers(userId);
+
+        res.render("dashboard", {
+            matchingUsers, 
+        })
+
     } catch (err) {
-      res.status(500).send('Error fetching data');
+
+        console.error("Error fetching dashboard data:", err.message)
+        res.status(500).send("An error occurred while loading your dashboard.")
+
     }
 })
 
@@ -130,7 +132,7 @@ app.post("/sign-up", async (req, res) => {
 
         await business.createUser(username, email, password, knownLanguagesArray, learningLanguagesArray, profilePicturePath)
         await business.sendVerificationEmail(email, username)
-        res.redirect(`/login?message=${encodeURIComponent("Registration successful. A verification email has been sent to your inbox. Please verify your email to log in.")}&type=success`)
+        res.redirect(`/login?message=${encodeURIComponent("Registration successful. A verification email has been sent to your inbox.")}&type=success`)
 
     }
 
@@ -175,9 +177,9 @@ app.post("/login", async (req, res) => {
             return res.redirect(`/login?message=${encodeURIComponent(loginResult.message)}&type=error`)
         }
 
-        const sessionKey = await business.startSession()
+        const sessionKey = await business.startSession(loginResult.userId)
         res.cookie("sessionKey", sessionKey, { httpOnly: true })
-        res.redirect("/dashboard/"+ loginResult.userId)
+        res.redirect("/dashboard")
 
     } catch (error) {
 
@@ -198,6 +200,7 @@ app.get("/logout", async (req, res) => {
         }
 
         res.redirect("/login?message=" + encodeURIComponent("You have been logged out."))
+        
     } catch (error) {
 
         console.error("Logout error:", error.message)
@@ -206,18 +209,44 @@ app.get("/logout", async (req, res) => {
     }
 })
 
-app.get("/badges/:userId", async (req, res) => {
-    const userId  = req.params
+async function attachSessionData(req, res, next) {
+    const sessionKey = req.cookies.sessionKey
+    if (!sessionKey) {
+        return res.redirect("/login?message=" + encodeURIComponent("Please log in.") + "&type=error")
+    }
+
     try {
-        const userBadges = await persistence.getUserBadges(userId)
+
+        const sessionData = await business.getSession(sessionKey)
+        if (!sessionData || !sessionData.userId) {
+            return res.redirect("/login?message=" + encodeURIComponent("Invalid session. Please log in again.") + "&type=error")
+        }
+        req.userId = sessionData.userId
+        next()
+
+    } catch (error) {
+
+        console.error("Error in attachSessionData middleware:", error.message)
+        res.redirect("/login?message=" + encodeURIComponent("An error occurred. Please try again.") + "&type=error")
+
+    }
+}
+
+app.get("/badges", attachSessionData, async (req, res) => {
+    try {
+    
+        const userBadges = await business.getUserBadges(req.userId)
 
         if (userBadges.length === 0) {
-            return res.render("badges", { message: "You have not earned any badges yet." })
+            return res.render("badges", { message: "You have not earned any badges yet" })
         }
         res.render("badges", { badges: userBadges })
+
     } catch (error) {
-        console.error("Error fetching badges:", error.message)
-        res.redirect(`/dashboard?message=${encodeURIComponent("An error occurred while retrieving the badges.")}&type=error`)
+
+        console.error("Error fetching badges:", error.message);
+        res.redirect(`/dashboard/test?message=${encodeURIComponent("An error occurred while retrieving the badges.")}&type=error`)
+
     }
 })
 

@@ -48,7 +48,11 @@ async function saveSession(session) {
 async function getSession(key) {
     try {
         await connectDatabase()
-        return await sessions.findOne({ sessionKey: key })
+        const session = await sessions.findOne({ sessionKey: key })
+        if (!session || session.expiry < new Date()) {
+            return null
+        }
+        return session.data
     } catch (error) {
         console.error("Error finding session data:", error)
     }
@@ -294,17 +298,17 @@ async function initializeBadges() {
 }
 
 
-async function getMatchingUsers(username){
+async function getMatchingUsers(userId){
 
     await connectDatabase()
 
-    let user = await getUserByUsername(username)
+    const user = await users.findOne({ _id: new mongodb.ObjectId(userId) })
     let learningLanguages = user.learningLanguages
 
     const matchingUsers = await users.find(
         {
           knownLanguages: { $in: learningLanguages },
-          username: { $ne: username }
+          username: { $ne: new mongodb.ObjectId(userId) }
         }
       ).toArray();
       console.log(matchingUsers)
