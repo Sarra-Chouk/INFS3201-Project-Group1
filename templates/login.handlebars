@@ -2,6 +2,10 @@
     .body {
         height: 100%;
     }
+
+    .alert {
+        width: 300px;
+    }
 </style>
 
 <body class="bg-light d-flex flex-column min-vh-100">
@@ -10,7 +14,7 @@
             <div class="col-lg-10">
                 <div class="card-group d-block d-md-flex row">
                     <!-- Login Section -->
-                    <div class="card col-md-8 p-5 mb-0">
+                    <div class="card col-md-8 p-5 mb-0 fixed">
                         <div class="card-body">
                             {{#if message}}
                             <div class="alert text-center {{#ifEquals type "

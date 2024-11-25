@@ -152,7 +152,7 @@ async function checkLogin(email, password) {
         const inputHash = hash.digest('hex')
 
         if (inputHash === storedHash) {
-            return { isValid: true, message: "Login successful." }
+            return { isValid: true, message: "Login successful.", userId:user.userId }
         } else {
             return { isValid: false, message: "Invalid email or password." }
         }
@@ -285,6 +285,10 @@ async function getMatchingUsers(username){
     return await persistence.getMatchingUsers(username)
 }
 
+async function getContacts(userId){
+    return await persistence.getContacts(userId)
+}
+
 
 module.exports = {
     startSession, getSession, deleteSession,
@@ -294,7 +298,7 @@ module.exports = {
     createUser,
     checkLogin,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
-    awardBadge, addContact,
+    awardBadge, addContact, getContacts,
     generateFormToken, cancelToken,
     getMatchingUsers
 }
