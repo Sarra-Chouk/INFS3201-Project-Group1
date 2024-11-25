@@ -28,6 +28,10 @@
     background-color: #545cf9;
     color: white;
   }
+
+  .image {
+    width: 50px;
+  }
 </style>
 
 <body class="bg-light d-flex flex-column min-vh-100">
@@ -58,10 +62,19 @@
           {{#each matchingUsers}}
           <tr>
             <td>{{this.username}}</td>
-            <td><img src="{{this.profilePicture}}" alt="{{this.username}}" class="profile-picture">
+            {{!-- a problem in desplying the image --}}
+            <td><img class="image" src="{{this.profilePicturePath}}" alt="{{this.username}}" class="profile-picture">
             </td>
-            <td>{{#each this.knownLanguages}}{{this}}, {{/each}}</td>
-            <td>{{#each this.learningLanguages}}{{this}}, {{/each}}</td>
+            <td>
+              {{#each this.knownLanguages}}
+              {{this}}{{#unless @last}}, {{/unless}}
+              {{/each}}
+            </td>
+            <td>
+              {{#each this.learningLanguages}}
+              {{this}}{{#unless @last}}, {{/unless}}
+              {{/each}}
+            </td>
             <td>
               <button class="btn btn-success btn-sm">Add Contact</button>
               <button class="btn btn-danger btn-sm">Block Contact</button>

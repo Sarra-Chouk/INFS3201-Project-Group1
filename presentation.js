@@ -23,6 +23,8 @@ app.use('/images', express.static(__dirname + "/static/profilePictures"))
 app.use(fileUpload())
 
 
+//session stuff are not implemented yet
+//sending the username in the route is not implemented yet
 app.get('/dashboard/:username', async (req, res) => {
     const username = req.params.username; 
 
