@@ -300,5 +300,5 @@ module.exports = {
     createUser,
     storeKey, getUserByKey, clearKey, updatePassword,
     addContact, removeContact, getContactList,
-    getAllBadges, getUserBadges, awardBadge
+    getAllBadges, getUserBadges, awardBadge, 
 }

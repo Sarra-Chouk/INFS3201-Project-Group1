@@ -22,7 +22,8 @@ app.use(cookieParser())
 app.use('/images', express.static(__dirname + "/static/profilePictures"))
 app.use(fileUpload())
 
-app.get("/dashboard", (req, res) => {
+
+app.get('/dashboard', async (req, res) => {
     res.render("dashboard")
 })
 

@@ -281,6 +281,7 @@ async function cancelToken(key) {
     await persistence.updateSession(key, sessionData)
 }
 
+
 module.exports = {
     startSession, getSession, deleteSession,
     getUserByEmail,
@@ -290,6 +291,6 @@ module.exports = {
     checkLogin,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
     awardBadge, addContact,
-    generateFormToken, cancelToken
+    generateFormToken, cancelToken,
 
 }
