@@ -22,6 +22,26 @@ app.use(cookieParser())
 app.use('/images', express.static(__dirname + "/static/profilePictures"))
 app.use(fileUpload())
 
+app.get("/dashboard", (req, res) => {
+    res.render("dashboard")
+})
+
+app.get("/profile", (req, res) => {
+    res.render("profile")
+})
+
+app.get("/my-contacts", (req, res) => {
+    res.render("myContacts")
+})
+
+app.get("/blocked-contacts", (req, res) => {
+    res.render("blockedContacts")
+})
+
+app.get("/badges", (req, res) => {
+    res.render("badges")
+})
+
 app.get("/", (req, res) => {
     res.render("index")
 })

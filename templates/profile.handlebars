@@ -1,0 +1,55 @@
+<style>
+    .body {
+        height: 100%;
+    }
+
+    .sidebar-nav {
+        height: 100%;
+        background-color: #f8f9fa;
+        padding-top: 20px;
+    }
+
+    .sidebar-nav .nav-item .nav-link {
+        color: #495057;
+        text-align: left;
+        text-decoration: none;
+        padding: 10px 20px;
+        display: block;
+        border-radius: 5px;
+        width: 200px;
+    }
+
+    .sidebar-nav .nav-item .nav-link:hover {
+        background-color: #efefef;
+        color: #495057;
+    }
+
+    .sidebar-nav .nav-item .active {
+        background-color: #545cf9;
+        color: white;
+    }
+</style>
+
+<body class="bg-light d-flex flex-column min-vh-100">
+    <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
+        <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+        </li>
+        <li class="nav-item"><a class="nav-link active" href="/profile"><i class="bi bi-person me-2"></i>Profile</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="/my-contacts"><i class="bi bi-people me-2"></i>My
+                Contacts</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="/blocked-contacts"><i class="bi bi-person-x me-2"></i>Blocked
+                Contacts</a></li>
+        <li class="nav-item"><a class="nav-link" href="/badges"><i class="bi bi-patch-check me-2"></i>Badges</a>
+        </li>
+    </ul>
+    </div>
+
+    <div class="body flex-grow-1 px-3">
+        <div class="container-lg">
+            <h1>Profile</h1>
+        </div>
+    </div>
+
+</body>
