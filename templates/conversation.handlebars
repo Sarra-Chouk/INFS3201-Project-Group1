@@ -1,0 +1,15 @@
+<body>
+    <h1>Chat</h1>
+    <div class="conversation">
+        {{#each conversation}}
+        <div class="{{#ifEquals this.senderId ../userId}}sent{{else}}received{{/ifEquals}}">
+            <p>{{this.message}}</p>
+            <small>{{this.timestamp}}</small>
+        </div>
+        {{/each}}
+    </div>
+    <form action="/chat/{{contactId}}" method="POST">
+        <textarea name="message" rows="3" placeholder="Type a message..."></textarea>
+        <button type="submit">Send</button>
+    </form>
+</body>

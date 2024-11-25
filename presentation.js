@@ -1,3 +1,4 @@
+const { ObjectId } = require('mongodb')
 const express = require("express")
 const business = require("./business.js")
 const bodyParser = require("body-parser")
@@ -123,7 +124,7 @@ app.post("/sign-up", async (req, res) => {
             throw new Error(isProfilePictureValid.message)
         }
 
-        let profilePicturePath = "/images/defaultProfilePicture.jpg"
+        let profilePicturePath = "/images/defaultProfilePicture.png"
         if (profilePicture) {
             const uniqueFileName = `${Date.now()}_${profilePicture.name}`
             profilePicturePath = `/images/${uniqueFileName}`
@@ -200,7 +201,7 @@ app.get("/logout", async (req, res) => {
         }
 
         res.redirect("/login?message=" + encodeURIComponent("You have been logged out."))
-        
+
     } catch (error) {
 
         console.error("Logout error:", error.message)
@@ -236,7 +237,6 @@ app.get("/badges", attachSessionData, async (req, res) => {
     try {
     
         const userBadges = await business.getUserBadges(req.userId)
-
         if (userBadges.length === 0) {
             return res.render("badges", { message: "You have not earned any badges yet" })
         }
@@ -320,6 +320,31 @@ app.post("/update-password", async (req, res) => {
         res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent("An unexpected error occurred. Please try again.")}&type=error`)
 
     } 
+})
+
+app.get('/conversation/:contactId', attachSessionData, async (req, res) => {
+    try {
+        const contactId = req.params.contactId
+        const userId = req.userId
+
+        const conversation = await business.getConversation(userId, contactId)
+        res.render('conversation', { conversation, contactId, userId })
+    } catch (error) {
+        console.error("Error fetching conversation:", error.message)
+    }
+})
+
+app.post('/conversation/:contactId', attachSessionData, async (req, res) => {
+    try {
+        const { message } = req.body
+        const senderId = req.userId
+        const receiverId = req.params.contactId
+
+        await business.sendMessage(senderId, receiverId, message)
+        res.redirect(`/conversation/${receiverId}`)
+    } catch (error) {
+        console.error("Error sending message:", error.message);
+    }
 })
 
 app.listen(8000, () => { })

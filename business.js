@@ -1,31 +1,11 @@
+const { ObjectId } = require('mongodb')
 const persistence = require('./persistence')
 const crypto = require("crypto")
 const nodemailer = require("nodemailer")
-
 let transporter = nodemailer.createTransport({
     host: "127.0.0.1",
     port: 25,
 })
-
-async function startSession(userId) {
-    const uuid = crypto.randomUUID()
-    const expiry = new Date(Date.now() + 10 * 60 * 1000)
-    const session = {
-        sessionKey: uuid,
-        expiry: expiry,
-        data: { userId: userId }
-    }
-    await persistence.saveSession(session)
-    return uuid
-}
-
-async function getSession(key) {
-    return await persistence.getSession(key)
-}
-
-async function deleteSession(key) {
-    return await persistence.deleteSession(key)
-}
 
 async function getUserByEmail(email) {
     return await persistence.getUserByEmail(email)
@@ -163,6 +143,26 @@ async function checkLogin(email, password) {
     }
 }
 
+async function startSession(userId) {
+    const uuid = crypto.randomUUID()
+    const expiry = new Date(Date.now() + 10 * 60 * 1000)
+    const session = {
+        sessionKey: uuid,
+        expiry: expiry,
+        data: { userId: userId }
+    }
+    await persistence.saveSession(session)
+    return uuid
+}
+
+async function getSession(key) {
+    return await persistence.getSession(key)
+}
+
+async function deleteSession(key) {
+    return await persistence.deleteSession(key)
+}
+
 async function storeResetKey(email) {
     let resetKey = crypto.randomUUID();
     await persistence.storeKey(email, resetKey, "reset")
@@ -215,6 +215,39 @@ async function updatePassword(email, newPassword) {
     await persistence.updatePassword(email, saltedHash)
 }
 
+async function getMatchingUsers(userId){
+    return await persistence.getMatchingUsers(userId)
+}
+
+async function getContacts(userId){
+    return await persistence.getContacts(userId)
+}
+
+async function addContact(userId, contactId) {
+    try {
+       
+        const contactProfile = await persistence.getUserProfile(contactId);
+        if (!contactProfile) {
+            throw new Error("Contact not found.");
+        }
+
+       
+        if (contactProfile.blockedBy) {
+            for (const blockedUserId of contactProfile.blockedBy) {
+                if (blockedUserId === userId) {
+                    throw new Error("You cannot add a user who has blocked you.");
+                }
+            }
+        }
+
+        await persistence.addContact(userId, contactId);
+        console.log(`Successfully added contact ${contactId} for user ${userId}`);
+    } catch (error) {
+        console.error("Error in business layer (addContact):", error.message);
+        throw error;
+    }
+}
+
 async function getUserBadges(userId) {
     return await persistence.getUserBadges(userId)
 }
@@ -246,32 +279,6 @@ async function awardBadge(userId) {
     }
 }
 
-async function addContact(userId, contactId) {
-    try {
-       
-        const contactProfile = await persistence.getUserProfile(contactId);
-        if (!contactProfile) {
-            throw new Error("Contact not found.");
-        }
-
-       
-        if (contactProfile.blockedBy) {
-            for (const blockedUserId of contactProfile.blockedBy) {
-                if (blockedUserId === userId) {
-                    throw new Error("You cannot add a user who has blocked you.");
-                }
-            }
-        }
-
-       
-        await persistence.addContact(userId, contactId);
-        console.log(`Successfully added contact ${contactId} for user ${userId}`);
-    } catch (error) {
-        console.error("Error in business layer (addContact):", error.message);
-        throw error;
-    }
-}
-
 async function generateFormToken(key) {
     let token = crypto.randomUUID()
     let sessionData = await persistence.getSession(key)
@@ -286,25 +293,25 @@ async function cancelToken(key) {
     await persistence.updateSession(key, sessionData)
 }
 
-async function getMatchingUsers(userId){
-    return await persistence.getMatchingUsers(userId)
+async function sendMessage(senderId, receiverId, message) {
+    return await persistence.saveMessage(senderId, receiverId, message)
 }
 
-async function getContacts(userId){
-    return await persistence.getContacts(userId)
+async function getConversation(userId1, userId2) {
+    return await persistence.getConversation(userId1, userId2)
 }
-
 
 module.exports = {
-    startSession, getSession, deleteSession,
     getUserByEmail,
     validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture, 
-    getUserByVerificationKey, sendVerificationEmail, verifyEmail,
     createUser,
+    getUserByVerificationKey, sendVerificationEmail, verifyEmail,
     checkLogin,
+    startSession, getSession, deleteSession,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
-    getUserBadges, awardBadge, 
+    getMatchingUsers,
     addContact, getContacts,
+    getUserBadges, awardBadge, 
     generateFormToken, cancelToken,
-    getMatchingUsers
+    sendMessage, getConversation
 }
