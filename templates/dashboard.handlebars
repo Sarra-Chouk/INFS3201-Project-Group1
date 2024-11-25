@@ -3,6 +3,14 @@
     height: 100%;
   }
 
+   .welcome-message {
+    position: absolute;
+    top: 22px;
+    right: 15px;
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
   .sidebar-nav {
     height: 100%;
     background-color: #f8f9fa;
@@ -35,6 +43,9 @@
 </style>
 
 <body class="bg-light d-flex flex-column min-vh-100">
+   <div class="welcome-message">
+    <span>Welcome, {{username}}</span>
+  </div>
   <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
     <li class="nav-item"><a class="nav-link active" href="/dashboard"><i
           class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>

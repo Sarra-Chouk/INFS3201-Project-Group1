@@ -1,36 +1,29 @@
 <style>
-    body {
-        display: flex;
-        margin: 0;
-        height: 100vh;
-        font-family: Arial, sans-serif;
-        background-color: #f4f6f9;
+    .body {
+        height: 100%;
     }
-
+    
     .sidebar-nav {
-        width: 250px;
+        height: 100%;
         background-color: #f8f9fa;
         padding-top: 20px;
-        height: 100vh;
-        box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-        position: fixed;
-        left: 0;
-        top: 0;
-    }
-
-    .sidebar-nav .nav-item {
-        margin-bottom: 10px;
     }
 
     .sidebar-nav .nav-item .nav-link {
-        display: block;
-        padding: 10px 20px;
-        text-decoration: none;
         color: #495057;
+        text-align: left;
+        text-decoration: none;
+        padding: 10px 20px;
+        display: block;
         border-radius: 5px;
+        width: 200px;
     }
 
-    .sidebar-nav .nav-item .nav-link:hover,
+    .sidebar-nav .nav-item .nav-link:hover {
+        background-color: #efefef;
+        color: #495057;
+    }
+
     .sidebar-nav .nav-item .active {
         background-color: #545cf9;
         color: white;
@@ -39,10 +32,8 @@
     .main-content {
         margin-left: 250px;
         flex: 1;
-        display: flex;
         align-items: center;
         justify-content: center;
-        padding: 20px;
     }
 
     .profile-container {
@@ -99,24 +90,23 @@
         font-size: 14px;
         text-align: center;
     }
-
-    .footer {
-        text-align: center;
-        margin-top: 20px;
-        color: #aaa;
-    }
 </style>
 
 <body>
-    
-    <ul class="sidebar-nav">
-        <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a></li>
-        <li class="nav-item"><a class="nav-link active" href="/profile"><i class="bi bi-person me-2"></i>Profile</a></li>
-        <li class="nav-item"><a class="nav-link" href="/my-contacts"><i class="bi bi-people me-2"></i>My Contacts</a></li>
-        <li class="nav-item"><a class="nav-link" href="/blocked-contacts"><i class="bi bi-person-x me-2"></i>Blocked Contacts</a></li>
-        <li class="nav-item"><a class="nav-link" href="/badges"><i class="bi bi-patch-check me-2"></i>Badges</a></li>
-    </ul>
 
+    <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
+        <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
+        </li>
+        <li class="nav-item"><a class="nav-link active" href="/profile"><i class="bi bi-person me-2"></i>Profile</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="/my-contacts"><i class="bi bi-people me-2"></i>My Contacts</a>
+        </li>
+        <li class="nav-item"><a class="nav-link" href="/blocked-contacts"><i class="bi bi-person-x me-2"></i>Blocked
+                Contacts</a></li>
+        <li class="nav-item"><a class="nav-link" href="/badges"><i class="bi bi-patch-check me-2"></i>Badges</a>
+        </li>
+    </ul>
+    </div>
     <div class="main-content">
         <div class="profile-container">
             <img src="{{profilePicture}}" alt="Profile Picture" class="profile-picture">
@@ -126,11 +116,11 @@
             <div class="badges-title">Your Badges</div>
             <div class="badges-container">
                 {{#if badges}}
-                    {{#each badges}}
-                        <div class="badge">{{this.name}}</div>
-                    {{/each}}
+                {{#each badges}}
+                <div class="badge">{{this.name}}</div>
+                {{/each}}
                 {{else}}
-                    <div>You have not earned any badges yet.</div>
+                <div>You have not earned any badges yet</div>
                 {{/if}}
             </div>
         </div>

@@ -28,11 +28,11 @@ app.get("/dashboard", attachSessionData, async (req, res) => {
     try {
 
         const userId = req.userId
-        const matchingUsers = await business.getMatchingUsers(userId);
+        const user = await business.getUserById(userId)
+        console.log(user)
+        const matchingUsers = await business.getMatchingUsers(userId)
 
-        res.render("dashboard", {
-            matchingUsers, 
-        })
+        res.render("dashboard", {matchingUsers, username: user.username})
 
     } catch (err) {
 
@@ -59,9 +59,7 @@ app.get("/profile", attachSessionData, async (req, res) => {
         console.error("Error rendering profile:", error.message);
         res.status(500).send("An error occurred while loading your profile.");
     }
-});
-
-
+})
 
 app.get("/my-contacts/:userId", async (req, res) => {
     const userId = req.params.userId; 

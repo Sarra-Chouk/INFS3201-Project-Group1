@@ -7,6 +7,10 @@ let transporter = nodemailer.createTransport({
     port: 25,
 })
 
+async function getUserById(userId) {
+    return await persistence.getUserById(userId)
+}
+
 async function getUserByEmail(email) {
     return await persistence.getUserByEmail(email)
 }
@@ -133,7 +137,7 @@ async function checkLogin(email, password) {
         const inputHash = hash.digest('hex')
 
         if (inputHash === storedHash) {
-            return { isValid: true, message: "Login successful.",  userId: user._id }
+            return { isValid: true, message: "Login successful.",  userId: user._id}
         } else {
             return { isValid: false, message: "Invalid email or password." }
         }
@@ -248,6 +252,30 @@ async function addContact(userId, contactId) {
     }
 }
 
+async function getProfile(userId) {
+    try {
+        // Fetch user information from persistence layer
+        const user = await persistence.getUserById(userId); 
+        if (!user) {
+            throw new Error("User not found.");
+        }
+
+        // Fetch badges associated with the user
+        const badges = await persistence.getUserBadges(userId);
+
+        // Return profile details
+        return {
+            username: user.username,
+            email: user.email,
+            profilePicture: user.profilePicturePath || "/images/defaultProfilePicture.jpg",
+            badges: badges || []
+        };
+    } catch (error) {
+        console.error("Error fetching profile:", error.message);
+        throw error;
+    }
+}
+
 async function getUserBadges(userId) {
     return await persistence.getUserBadges(userId)
 }
@@ -301,34 +329,8 @@ async function getConversation(userId1, userId2) {
     return await persistence.getConversation(userId1, userId2)
 }
 
-async function getProfile(userId) {
-    try {
-        // Fetch user information from persistence layer
-        const user = await persistence.getUserById(userId); 
-        if (!user) {
-            throw new Error("User not found.");
-        }
-
-        // Fetch badges associated with the user
-        const badges = await persistence.getUserBadges(userId);
-
-        // Return profile details
-        return {
-            username: user.username,
-            email: user.email,
-            profilePicture: user.profilePicturePath || "/images/defaultProfilePicture.jpg",
-            badges: badges || []
-        };
-    } catch (error) {
-        console.error("Error fetching profile:", error.message);
-        throw error;
-    }
-}
-
-
-
 module.exports = {
-    getUserByEmail,
+    getUserById, getUserByEmail,
     validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture, 
     createUser,
     getUserByVerificationKey, sendVerificationEmail, verifyEmail,
@@ -337,7 +339,8 @@ module.exports = {
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
     getMatchingUsers,
     addContact, getContacts,
+    getProfile,
     getUserBadges, awardBadge, 
     generateFormToken, cancelToken,
-    sendMessage, getConversation, getProfile
+    sendMessage, getConversation
 }
