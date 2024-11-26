@@ -587,6 +587,20 @@ app.get("/block-contact/:contactId", attachSessionData, async (req, res) => {
     }
 })
 
+/**
+ * Route handler for unblocking a contact.
+ * Calls the `unblockContact` function to remove a contact from the user's blocked list.
+ * Requires session data, validated by the `attachSessionData` middleware.
+ * 
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {string} req.userId - The ID of the currently logged-in user, extracted from session data.
+ * @param {string} req.params.contactId - The ID of the contact to be unblocked.
+ * 
+ * @throws {Error} If any error occurs while unblocking the contact.
+ * 
+ * @returns {void} Redirects to the "blocked-contacts" page with a success or error message.
+ */
 app.post("/unblock-contact/:contactId", attachSessionData, async (req, res) => {
     const userId = req.userId
     const contactId = req.params.contactId
