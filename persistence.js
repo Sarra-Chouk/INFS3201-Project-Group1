@@ -486,6 +486,20 @@ async function getContacts(userId) {
     }
 }
 
+/**
+ * Blocks a contact for a specific user by adding the contact ID to the user's blocked contacts list.
+ *
+ * @async
+ * @function blockContact
+ * @param {string} userId - The ID of the user who wants to block the contact.
+ * @param {string} contactId - The ID of the contact to be blocked.
+ * @returns {Promise<void>} No return value, but logs the success or failure of the operation.
+ * @throws {Error} Logs an error if the block operation fails.
+ *
+ * @description This function updates the `blockedContacts` array in the user's document by adding
+ *              the `contactId` if it doesn't already exist. The operation ensures no duplicates
+ *              using `$addToSet`.
+ */
 async function blockContact(userId, contactId) {
     try {
         await connectDatabase()

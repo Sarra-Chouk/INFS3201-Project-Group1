@@ -546,6 +546,20 @@ async function getProfile(userId) {
     }
 }
 
+/**
+ * Checks if a user is blocked by another user.
+ *
+ * @async
+ * @function isBlocked
+ * @param {string} loggedInUserId - The ID of the currently logged-in user (who is attempting to view the profile).
+ * @param {string} contactId - The ID of the user whose profile is being accessed.
+ * @returns {Promise<boolean>} Returns `true` if the logged-in user is blocked by the specified contact, otherwise `false`.
+ * @throws {Error} Throws an error if the block status cannot be determined due to an issue in fetching data.
+ *
+ * @description This function determines whether the logged-in user is blocked by another user. It checks if the
+ *              `loggedInUserId` exists in the `blockedContacts` array of the contact's profile. If the contact's
+ *              profile is not found, it logs an error and returns `false`.
+ */
 async function isBlocked(loggedInUserId, contactId) {
     try {
         const contactProfile = await persistence.getUserById(contactId)
