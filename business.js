@@ -222,6 +222,10 @@ async function removeContact(userId, contactId) {
     await persistence.removeContact(userId, contactId)
 }
 
+async function blockContact(userId, contactId){
+    await persistence.blockContact(userId, contactId)
+}
+
 async function getProfile(userId) {
     const user = await persistence.getUserById(userId)
     if (!user) {
@@ -305,10 +309,6 @@ async function cancelToken(key) {
     await persistence.updateSession(key, sessionData)
 }
 
-async function blockContact(userId, contactId){
-    await persistence.blockContact(userId, contactId)
-}
-
 module.exports = {
     getUserById, getUserByEmail,
     validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture,
@@ -318,10 +318,9 @@ module.exports = {
     startSession, getSession, deleteSession,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
     getMatchingUsers,
-    getContacts, addContact, removeContact,
+    getContacts, addContact, removeContact, blockContact,
     getProfile,
     getUserBadges, awardBadge,
     sendMessage, getConversation,
     generateFormToken, cancelToken,
-    blockContact
 }
