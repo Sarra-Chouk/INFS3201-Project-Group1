@@ -64,13 +64,13 @@ async function validateProfilePicture(profilePicture) {
 function createSaltedHash(password) {
     const salt = crypto.randomBytes(4).toString('hex');
     const hash = crypto.createHash('sha1')
-    hash.update(salt + password) 
+    hash.update(salt + password)
     const saltedHash = salt + ":" + hash.digest('hex')
     return saltedHash
 }
 
 async function createUser(username, email, password, knownLanguages, learningLanguages, profilePicturePath) {
-    const hashedPassword = createSaltedHash(password) 
+    const hashedPassword = createSaltedHash(password)
     if (await validateEmail && await validateUsername && await validatePassword && await checkEmailExists) {
         const user = {
             username: username,
@@ -82,7 +82,7 @@ async function createUser(username, email, password, knownLanguages, learningLan
             isVerified: false
         }
         await persistence.createUser(user)
-    } 
+    }
 }
 
 async function getUserByVerificationKey(verificationKey) {
@@ -108,42 +108,29 @@ async function sendVerificationEmail(email, username) {
 }
 
 async function verifyEmail(key) {
-    try {
-        const user = await persistence.getUserByKey(key, "verification")
-        if (!user) throw new Error("Verification failed. The link may have expired or is invalid.")
-
-        await persistence.updateUserField(user.email, { isVerified: true })
-
-        await persistence.clearKey(user.email, "verification")
-
-        console.log(`Email verified for user: ${user.username}`)
-    } catch (error) {
-        console.error("Error during email verification:", error.message)
-    }
+    const user = await persistence.getUserByKey(key, "verification")
+    if (!user) throw new Error("Verification failed. The link may have expired or is invalid.")
+    await persistence.updateUserField(user.email, { isVerified: true })
+    await persistence.clearKey(user.email, "verification")
 }
 
 async function checkLogin(email, password) {
-    try {
-        const user = await persistence.getUserByEmail(email)
-        if (!user) {
-            return { isValid: false, message: "Invalid email or password." }
-        }
-        if (!user.isVerified) {
-            return { isValid: false, message: "Email is not verified. Please verify your email before logging in." }
-        }
-        const [storedSalt, storedHash] = user.password.split(':')
-        const hash = crypto.createHash('sha1')
-        hash.update(storedSalt + password) 
-        const inputHash = hash.digest('hex')
-
-        if (inputHash === storedHash) {
-            return { isValid: true, message: "Login successful.",  userId: user._id}
-        } else {
-            return { isValid: false, message: "Invalid email or password." }
-        }
+    const user = await persistence.getUserByEmail(email)
+    if (!user) {
+        return { isValid: false, message: "Invalid email or password." }
     }
-    catch (error) {
-        console.error('Error during login check:', error)
+    if (!user.isVerified) {
+        return { isValid: false, message: "Email is not verified. Please verify your email before logging in." }
+    }
+    const [storedSalt, storedHash] = user.password.split(':')
+    const hash = crypto.createHash('sha1')
+    hash.update(storedSalt + password)
+    const inputHash = hash.digest('hex')
+
+    if (inputHash === storedHash) {
+        return { isValid: true, message: "Login successful.", userId: user._id }
+    } else {
+        return { isValid: false, message: "Invalid email or password." }
     }
 }
 
@@ -195,19 +182,19 @@ async function sendPasswordResetEmail(email, resetKey) {
 
 async function resetPassword(resetKey, newPassword, confirmedPassword) {
     if (! await validatePassword(newPassword)) {
-        return { isValid: false, message: "Password must be at least 8 characters, include a number, a special character, an uppercase and lowercase letter."}
+        return { isValid: false, message: "Password must be at least 8 characters, include a number, a special character, an uppercase and lowercase letter." }
     }
     if (newPassword.trim() !== confirmedPassword.trim()) {
-        return {isValid: false, message: "The passwords you entered do not match. Please ensure both password fields are the same."}
+        return { isValid: false, message: "The passwords you entered do not match. Please ensure both password fields are the same." }
     }
     const user = await persistence.getUserByKey(resetKey, "reset")
     if (!user) {
-        return { isValid: false, message: "Your reset link is invalid or has expired. Please request a new link."}
+        return { isValid: false, message: "Your reset link is invalid or has expired. Please request a new link." }
     }
     const saltedHash = createSaltedHash(newPassword)
     await persistence.updatePassword(user.email, saltedHash)
     await persistence.clearKey(user.email, "reset")
-    return { isValid: true}
+    return { isValid: true }
 }
 
 async function updatePassword(email, newPassword) {
@@ -219,60 +206,40 @@ async function updatePassword(email, newPassword) {
     await persistence.updatePassword(email, saltedHash)
 }
 
-async function getMatchingUsers(userId){
+async function getMatchingUsers(userId) {
     return await persistence.getMatchingUsers(userId)
 }
 
-async function getContacts(userId){
+async function getContacts(userId) {
     return await persistence.getContacts(userId)
 }
 
 async function addContact(userId, contactId) {
-    try {
-       
-        const contactProfile = await getProfile(contactId);
-        if (!contactProfile) {
-            throw new Error("Contact not found.");
-        }
-
-       
-        if (contactProfile.blockedBy) {
-            for (const blockedUserId of contactProfile.blockedBy) {
-                if (blockedUserId === userId) {
-                    throw new Error("You cannot add a user who has blocked you.");
-                }
+    const contactProfile = await getProfile(contactId)
+    if (!contactProfile) {
+        throw new Error("Contact not found.")
+    }
+    if (contactProfile.blockedBy) {
+        for (const blockedUserId of contactProfile.blockedBy) {
+            if (blockedUserId === userId) {
+                throw new Error("You cannot add a user who has blocked you.")
             }
         }
-
-        await persistence.addContact(userId, contactId);
-        console.log(`Successfully added contact ${contactId} for user ${userId}`);
-    } catch (error) {
-        console.error("Error in business layer (addContact):", error.message);
-        throw error;
     }
+    await persistence.addContact(userId, contactId);
 }
 
 async function getProfile(userId) {
-    try {
-        // Fetch user information from persistence layer
-        const user = await persistence.getUserById(userId); 
-        if (!user) {
-            throw new Error("User not found.");
-        }
-
-        // Fetch badges associated with the user
-        const badges = await persistence.getUserBadges(userId);
-
-        // Return profile details
-        return {
-            username: user.username,
-            email: user.email,
-            profilePicture: user.profilePicturePath || "/images/defaultProfilePicture.jpg",
-            badges: badges || []
-        };
-    } catch (error) {
-        console.error("Error fetching profile:", error.message);
-        throw error;
+    const user = await persistence.getUserById(userId)
+    if (!user) {
+        throw new Error("User not found.")
+    }
+    const badges = await persistence.getUserBadges(userId)
+    return {
+        username: user.username,
+        email: user.email,
+        profilePicture: user.profilePicturePath || "/images/defaultProfilePicture.jpg",
+        badges: badges || []
     }
 }
 
@@ -282,7 +249,6 @@ async function getUserBadges(userId) {
 
 async function hasReceivedReply(senderId, receiverId) {
     const convo = await getConversation(senderId, receiverId)
-
     if (convo.length >= 2) {
         for (let i = 0; i < convo.length - 1; i++) {
             const currentMessage = convo[i]
@@ -302,29 +268,25 @@ async function hasReceivedReply(senderId, receiverId) {
 }
 
 async function awardBadge(senderId, receiverId) {
-    try {
-        const allBadges = await persistence.getAllBadges()
-        const userMessages = await persistence.getUserMessages(senderId)
-        const badgeRules = {
-            "First Conversation": async () => {
-                return await hasReceivedReply(senderId, receiverId)
-            },
-            "100 Messages Sent": async () => {
-                return userMessages.length >= 100
-            }
+    const allBadges = await persistence.getAllBadges()
+    const userMessages = await persistence.getUserMessages(senderId)
+    const badgeRules = {
+        "First Conversation": async () => {
+            return await hasReceivedReply(senderId, receiverId)
+        },
+        "100 Messages Sent": async () => {
+            return userMessages.length >= 100
         }
+    }
 
-        for (const badge of allBadges) {
-            const userBadges = await persistence.getUserBadges(senderId)
-            if (userBadges.some(b => b.name === badge.name)) continue
+    for (const badge of allBadges) {
+        const userBadges = await persistence.getUserBadges(senderId)
+        if (userBadges.some(b => b.name === badge.name)) continue
 
-            const isEligible = await badgeRules[badge.name]?.()
-            if (isEligible) {
-                await persistence.awardBadge(senderId, badge)
-            }
+        const isEligible = await badgeRules[badge.name]?.()
+        if (isEligible) {
+            await persistence.awardBadge(senderId, badge)
         }
-    } catch (error) {
-        console.error("Error in badge awarding process:", error)
     }
 }
 
@@ -352,7 +314,7 @@ async function getConversation(userId1, userId2) {
 
 module.exports = {
     getUserById, getUserByEmail,
-    validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture, 
+    validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture,
     createUser,
     getUserByVerificationKey, sendVerificationEmail, verifyEmail,
     checkLogin,
@@ -361,7 +323,7 @@ module.exports = {
     getMatchingUsers,
     addContact, getContacts,
     getProfile,
-    getUserBadges, awardBadge, 
+    getUserBadges, awardBadge,
     generateFormToken, cancelToken,
     sendMessage, getConversation
 }
