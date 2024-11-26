@@ -290,6 +290,14 @@ async function awardBadge(senderId, receiverId) {
     }
 }
 
+async function sendMessage(senderId, receiverId, message) {
+    return await persistence.saveMessage(senderId, receiverId, message)
+}
+
+async function getConversation(userId1, userId2) {
+    return await persistence.getConversation(userId1, userId2)
+}
+
 async function generateFormToken(key) {
     let token = crypto.randomUUID()
     let sessionData = await persistence.getSession(key)
@@ -304,14 +312,6 @@ async function cancelToken(key) {
     await persistence.updateSession(key, sessionData)
 }
 
-async function sendMessage(senderId, receiverId, message) {
-    return await persistence.saveMessage(senderId, receiverId, message)
-}
-
-async function getConversation(userId1, userId2) {
-    return await persistence.getConversation(userId1, userId2)
-}
-
 module.exports = {
     getUserById, getUserByEmail,
     validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture,
@@ -324,6 +324,6 @@ module.exports = {
     addContact, getContacts,
     getProfile,
     getUserBadges, awardBadge,
-    generateFormToken, cancelToken,
-    sendMessage, getConversation
+    sendMessage, getConversation,
+    generateFormToken, cancelToken
 }

@@ -216,7 +216,15 @@ async function deleteSession(key) {
 async function updateSession(key, data) {
     try {
         await connectDatabase()
-        const result = await sessions.replaceOne({ sessionKey: key }, data)
+        const session = await sessions.findOne({ sessionKey: key })
+        const updatedData = {
+            ...session.data, 
+            ...data 
+        }
+        await sessions.updateOne(
+            { sessionKey: key },
+            { $set: { data: updatedData } }
+        )
         if (result.modifiedCount > 0) {
             logInfo(`Session updated successfully for sessionKey: ${key}`)
         } else {

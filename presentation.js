@@ -126,6 +126,78 @@ app.get("/verify-email", async (req, res) => {
     }
 })
 
+app.get("/reset-password", async (req, res) => {
+    const message = req.query.message
+    const type = req.query.type
+    res.render("resetPassword", { message, type })
+})
+
+app.post("/reset-password", async (req, res) => {
+    const email = req.body.email
+
+    try {
+
+        const emailExists = await business.checkEmailExists(email)
+
+        if (!emailExists) {
+            return res.redirect(`/reset-password?message=${encodeURIComponent('Invalid or not registered email address.')}&type=error`)
+        }
+
+        const resetKey = await business.storeResetKey(email)
+        await business.sendPasswordResetEmail(email, resetKey)
+        res.redirect(`/reset-password?message=${encodeURIComponent('Password reset email sent. Please check your inbox.')}&type=success`)
+
+    } catch (error) {
+
+        console.error("Error in reset password process:", error.message)
+        return res.redirect(`/reset-password?message=${encodeURIComponent('An unexpected error occurred. Please try again.')}&type=error`)
+
+    }
+})
+
+app.get("/update-password", async (req, res) => {
+    const resetKey = req.query.key
+    const message = req.query.message
+    const type = req.query.type
+
+    try {
+
+        const user = await business.getUserByResetKey(resetKey)
+
+        if (!user) {
+            return res.redirect(`/update-password?message=${encodeURIComponent("Your reset link is invalid or has expired. Please request a new link.")}&type=error`)
+        }
+
+        res.render('updatePassword', { resetKey, message, type })
+    } catch (error) {
+
+        console.error("Error fetching reset key:", error.message)
+        res.redirect(`/update-password?message=${encodeURIComponent("An unexpected error occurred. Please try again.")}&type=error`)
+
+    }
+})
+
+app.post("/update-password", async (req, res) => {
+    const { resetKey, csrfToken, newPassword, confirmedPassword } = req.body
+
+    try {
+        
+        const resetResult = await business.resetPassword(resetKey, newPassword, confirmedPassword)
+
+        if (!resetResult.isValid) {
+            return res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent(resetResult.message)}&type=error`)
+        }
+
+        res.redirect(`/login?message=${encodeURIComponent("Password reset successful. Please log in with your new password.")}&type=success`)
+
+    } catch (error) {
+
+        console.error("Error in update password process:", error.message);
+        res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent("An unexpected error occurred. Please try again.")}&type=error`)
+
+    } 
+})
+
 app.get("/login", (req, res) => {
     const message = req.query.message
     const type = req.query.type
@@ -158,14 +230,14 @@ app.post("/login", async (req, res) => {
 async function attachSessionData(req, res, next) {
     const sessionKey = req.cookies.sessionKey
     if (!sessionKey) {
-        return res.redirect("/login?message=" + encodeURIComponent("Please log in.") + "&type=error")
+        return res.redirect(`/login?message=${encodeURIComponent("Please log in.")}&type=error`)
     }
 
     try {
 
         const sessionData = await business.getSession(sessionKey)
         if (!sessionData || !sessionData.userId) {
-            return res.redirect("/login?message=" + encodeURIComponent("Your session has expired. Please log in again.") + "&type=error")
+            return res.redirect(`/login?message=${encodeURIComponent("Your session has expired. Please log in again.")}&type=error`)
         }
         req.userId = sessionData.userId
         next()
@@ -248,13 +320,15 @@ app.get('/conversation/:receiverId', attachSessionData, async (req, res) => {
         const receiverId = req.params.receiverId
         const sender = await business.getUserById(senderId)
         const receiver = await business.getUserById(receiverId)
+        const csrfToken = await business.generateFormToken(req.cookies.sessionKey)
 
         const conversation = await business.getConversation(senderId, receiverId)
         res.render('conversation', {
             conversation, 
             sender: sender.username, 
             receiver: receiver.username,
-            receiverId: receiverId  
+            receiverId: receiverId,
+            csrfToken
         })
 
     } catch (error) {
@@ -268,10 +342,15 @@ app.get('/conversation/:receiverId', attachSessionData, async (req, res) => {
 app.post('/conversation/:receiverId', attachSessionData, async (req, res) => {
     try {
 
-        const { message } = req.body
+        const { message, csrfToken } = req.body
         const senderId = req.userId
         const receiverId = req.params.receiverId
- 
+
+        const sessionData = await business.getSession(req.cookies.sessionKey)
+        if (!sessionData || sessionData.csrfToken !== csrfToken) {
+            return res.redirect(`/login?message=${encodeURIComponent("Your session has expired. Please log in again.")}&type=error`)
+        }
+
         await business.sendMessage(senderId, receiverId, message)
         await business.awardBadge(senderId, receiverId)
         await business.awardBadge(receiverId, senderId)
@@ -307,84 +386,13 @@ app.get("/badges", attachSessionData, async (req, res) => {
     }
 })
 
-app.get("/reset-password", async (req, res) => {
-    const message = req.query.message
-    const type = req.query.type
-    res.render("resetPassword", { message, type })
-})
-
-app.post("/reset-password", async (req, res) => {
-    const email = req.body.email
-
-    try {
-
-        const emailExists = await business.checkEmailExists(email)
-
-        if (!emailExists) {
-            return res.redirect('/reset-password?message=' + encodeURIComponent('Invalid or not registered email address.') + '&type=error')
-        }
-
-        const resetKey = await business.storeResetKey(email)
-        await business.sendPasswordResetEmail(email, resetKey)
-        res.redirect('/reset-password?message=' + encodeURIComponent('Password reset email sent. Please check your inbox.') + '&type=success')
-
-    } catch (error) {
-
-        console.error("Error in reset password process:", error.message)
-        return res.redirect('/reset-password?message=' + encodeURIComponent('An unexpected error occurred. Please try again.') + '&type=error')
-
-    }
-})
-
-app.get("/update-password", async (req, res) => {
-    const resetKey = req.query.key
-    const message = req.query.message
-    const type = req.query.type
-
-    try {
-
-        const user = await business.getUserByResetKey(resetKey)
-
-        if (!user) {
-            return res.redirect(`/update-password?message=${encodeURIComponent("Your reset link is invalid or has expired. Please request a new link.")}&type=error`)
-        }
-
-        res.render('updatePassword', { resetKey, message, type })
-    } catch (error) {
-
-        console.error("Error fetching reset key:", error.message)
-        res.redirect(`/update-password?message=${encodeURIComponent("An unexpected error occurred. Please try again.")}&type=error`)
-
-    }
-})
-
-app.post("/update-password", async (req, res) => {
-    const { resetKey, csrfToken, newPassword, confirmedPassword } = req.body
-
-    try {
-        
-        const resetResult = await business.resetPassword(resetKey, newPassword, confirmedPassword)
-
-        if (!resetResult.isValid) {
-            return res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent(resetResult.message)}&type=error`)
-        }
-
-        res.redirect(`/login?message=${encodeURIComponent("Password reset successful. Please log in with your new password.")}&type=success`)
-
-    } catch (error) {
-
-        console.error("Error in update password process:", error.message);
-        res.redirect(`/update-password?key=${resetKey}&message=${encodeURIComponent("An unexpected error occurred. Please try again.")}&type=error`)
-
-    } 
-})
-
 app.get("/logout", async (req, res) => {
     const sessionKey = req.cookies.sessionKey
 
     try {
 
         if (sessionKey) {
+            await business.cancelToken(sessionKey)
             await business.deleteSession(sessionKey)
             res.clearCookie("sessionKey")
         }
