@@ -486,8 +486,6 @@ async function getContacts(userId) {
     }
 }
 
-
-
 async function blockContact(userId, contactId) {
     try {
         await connectDatabase()
@@ -720,26 +718,24 @@ async function blockContact(userId, contactId) {
 
 async function getBlockedContacts(userId) {
     try {
-        await connectDatabase()
-        const user = await users.findOne(
-            { _id: new ObjectId(userId) }
-        )
+        await connectDatabase();
+        const user = await users.findOne({ _id: new ObjectId(userId) })
         if (!user) {
             logInfo(`No user found with userId: ${userId}`)
             return []
         }
         if (user.blockedContacts && user.blockedContacts.length > 0) {
-            const blockedContacts = await users.find(
-                { _id: { $in: user.blockedContacts.map(id => new ObjectId(id)) } }
-            ).toArray()
+            const blockedContacts = await users.find({
+                _id: { $in: user.blockedContacts.map(id => new ObjectId(id)) }
+            }).toArray();
 
-            logInfo(`Retrieved ${blockedContacts.length} blocked contacts for userId: ${userId}`)
             return blockedContacts
         }
         logInfo(`No blocked contacts found for userId: ${userId}`)
         return []
     } catch (error) {
         logError(`Error retrieving blocked contacts for userId: ${userId} - ${error}`)
+        return []
     }
 }
 

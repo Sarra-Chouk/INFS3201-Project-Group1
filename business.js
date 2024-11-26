@@ -500,7 +500,7 @@ async function blockContact(userId, contactId){
 }
 
 async function getBlockedContacts(userId) {
-    await persistence.getBlockedContacts(userId)
+    return await persistence.getBlockedContacts(userId)
 }
 
 /**
@@ -685,5 +685,5 @@ module.exports = {
     getUserBadges, awardBadge,
     sendMessage, getConversation,
     generateFormToken, cancelToken,
-    blockContact
+    blockContact, getBlockedContacts
 }
