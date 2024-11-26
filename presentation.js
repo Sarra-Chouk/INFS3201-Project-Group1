@@ -333,16 +333,36 @@ app.get("/add-contact/:contactId", attachSessionData, async (req, res) => {
     }
 })
 
-app.get("/my-contacts", attachSessionData, async (req, res) => {
 
-    const userId = req.userId;
+app.get("/block-contact/:contactId", attachSessionData, async (req, res) => {
 
     try {
-      const contacts = await business.getContacts(userId);
-      
-      res.render('myContacts', {
-        contacts: contacts
-      });
+        const contactId = req.params.contactId
+        const userId = req.userId
+
+        await business.blockContact(userId, contactId)
+
+        res.redirect(`/dashboard?message=${encodeURIComponent("Contact blocked successfully!")}&type=success`)
+    } catch (error) {
+        console.error("Error blocking contact:", error.message)
+        res.redirect(`/dashboard?message=${encodeURIComponent("An error occurred while blocking the contact.")}&type=error`)
+    }
+})
+
+
+app.get("/blocked-contacts", attachSessionData, async (req, res) => {
+
+    const userId = req.userId
+    const message = req.query.message
+    const type = req.query.type
+
+    try {
+      const blockedContacts = await business.getBlockedContacts(userId)
+      res.render('blockedContacts', {
+        blockedContacts: blockedContacts,
+        message: message,
+        type: type
+      })
     } catch (err) {
       res.status(500).send('Error fetching data');
     }
@@ -398,10 +418,6 @@ app.post('/conversation/:receiverId', attachSessionData, async (req, res) => {
         res.status(500).send("An error occurred while sending the message.")
 
     }
-})
-
-app.get("/blocked-contacts", (req, res) => {
-    res.render("blockedContacts")
 })
 
 app.get("/badges", attachSessionData, async (req, res) => {
