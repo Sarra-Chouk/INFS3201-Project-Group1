@@ -240,25 +240,12 @@ async function getMatchingUsers(userId) {
         await connectDatabase()
         const user = await users.findOne({ _id: new ObjectId(userId) })
         let learningLanguages = user.learningLanguages
-        let blockedContacts = user.blockedContacts
-        let matchingUsers = []
 
-        if(blockedContacts){
-            matchingUsers = await users.find({
-            knownLanguages: { $in: learningLanguages },
-            _id: { 
-                $ne: new ObjectId(userId),
-                $nin: blockedContacts
-            }
-        }).toArray()
-    } else{
-        matchingUsers = await users.find({
-            knownLanguages: { $in: learningLanguages },
-            _id: { 
-                $ne: new ObjectId(userId),
-            }
-        }).toArray()
-    }  
+        const matchingUsers = await users.find({
+                knownLanguages: { $in: learningLanguages },
+                _id: { $ne: new ObjectId(userId)},
+            }).toArray()
+
 
         logInfo(`Found ${matchingUsers.length} matching users for userId: ${userId}`)
         return matchingUsers
