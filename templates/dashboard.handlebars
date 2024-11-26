@@ -3,7 +3,7 @@
     height: 100%;
   }
 
-   .welcome-message {
+  .welcome-message {
     position: absolute;
     top: 22px;
     right: 15px;
@@ -43,7 +43,7 @@
 </style>
 
 <body class="bg-light d-flex flex-column min-vh-100">
-   <div class="welcome-message">
+  <div class="welcome-message">
     <span>Welcome, {{username}}</span>
   </div>
   <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
@@ -87,8 +87,8 @@
               {{/each}}
             </td>
             <td>
-              <button class="btn btn-success btn-sm">Add Contact</button>
-              <button class="btn btn-danger btn-sm">Block Contact</button>
+              <button class="btn btn-success btn-sm"><i class="bi bi-person-plus-fill m-2"></i>Add Contact</button>
+              <button class="btn btn-danger btn-sm"><i class="bi bi-ban m-2"></i>Block Contact</button>
             </td>
           </tr>
           {{/each}}

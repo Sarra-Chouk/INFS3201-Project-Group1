@@ -32,7 +32,7 @@ app.get("/dashboard", attachSessionData, async (req, res) => {
         console.log(user)
         const matchingUsers = await business.getMatchingUsers(userId)
 
-        res.render("dashboard", {matchingUsers, username: user.username})
+        res.render("dashboard", {matchingUsers, userId: userId, username: user.username})
 
     } catch (err) {
 
@@ -61,13 +61,13 @@ app.get("/profile", attachSessionData, async (req, res) => {
     }
 })
 
-app.get("/my-contacts/:userId", async (req, res) => {
-    const userId = req.params.userId; 
+app.get("/my-contacts", attachSessionData, async (req, res) => {
+
+    const userId = req.userId;
 
     try {
-      const contacts = await business.getContacts(userId);
-  
-      res.render('dashboard', {
+      const contacts = await business.getMatchingUsers(userId);
+      res.render('myContacts', {
         contacts,
       });
     } catch (err) {
