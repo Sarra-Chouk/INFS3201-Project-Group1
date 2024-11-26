@@ -499,6 +499,10 @@ async function blockContact(userId, contactId){
     await persistence.blockContact(userId, contactId)
 }
 
+async function getBlockedContacts(userId) {
+    await persistence.getBlockedContacts(userId)
+}
+
 /**
  * Retrieves the profile of a user, including their username, email, profile picture, and badges.
  *
@@ -681,4 +685,5 @@ module.exports = {
     getUserBadges, awardBadge,
     sendMessage, getConversation,
     generateFormToken, cancelToken,
+    blockContact
 }

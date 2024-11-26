@@ -88,8 +88,6 @@ async function updateUserField(email, updates) {
  * @returns {Object|null} The user object if found, or `null` if not found.
  * @throws Will log an error if the retrieval operation fails.
  */
-
-
 async function getUserById(userId) {
     try {
         await connectDatabase()
@@ -162,7 +160,6 @@ async function getUserByUsername(username) {
  * @returns {string|null} The ID of the newly created user, or `null` if the operation fails.
  * @throws Will log an error if the user creation operation fails.
  */
-
 async function createUser(user) {
     try {
         await connectDatabase()
@@ -184,7 +181,6 @@ async function createUser(user) {
  * @param {string} type - The type of key being stored (e.g., "reset", "verification").
  * @throws Will log an error if the key storage operation fails.
  */
-
 async function storeKey(email, key, type) {
     try {
         await connectDatabase()
@@ -211,7 +207,6 @@ async function storeKey(email, key, type) {
  * @returns {Object|null} The user object if found and the key is valid, or `null` if not found or expired.
  * @throws Will log an error if the retrieval operation fails.
  */
-
 async function getUserByKey(key, type) {
     try {
         await connectDatabase()
@@ -241,7 +236,6 @@ async function getUserByKey(key, type) {
  * @param {string} type - The type of key to clear (e.g., "reset", "verification").
  * @throws Will log an error if the key clearing operation fails.
  */
-
 async function clearKey(email, type) {
     try {
         await connectDatabase()
@@ -266,7 +260,6 @@ async function clearKey(email, type) {
  * @returns {boolean} `true` if the password was successfully updated, `false` otherwise.
  * @throws Will log an error if the password update operation fails.
  */
-
 async function updatePassword(email, newPassword) {
     try {
         await connectDatabase()
@@ -291,7 +284,6 @@ async function updatePassword(email, newPassword) {
  * @param {Object} session - The session object to be saved, including properties like sessionKey and other metadata.
  * @throws Will log an error if the session saving operation fails.
  */
-
 async function saveSession(session) {
     try {
         await connectDatabase()
@@ -311,7 +303,6 @@ async function saveSession(session) {
  * @returns {Object|null} The session data if found and valid, or `null` if not found or expired.
  * @throws Will log an error if the session retrieval operation fails.
  */
-
 async function getSession(key) {
     try {
         await connectDatabase()
@@ -339,7 +330,6 @@ async function getSession(key) {
  * @param {string} key - The session key of the session to be deleted.
  * @throws Will log an error if the session deletion operation fails.
  */
-
 async function deleteSession(key) {
     try {
         await connectDatabase()
@@ -363,7 +353,6 @@ async function deleteSession(key) {
  * @param {Object} data - The data to be merged into the existing session data.
  * @throws Will log an error if the session update operation fails.
  */
-
 async function updateSession(key, data) {
     try {
         await connectDatabase()
@@ -395,7 +384,6 @@ async function updateSession(key, data) {
  * @returns {Array<Object>} An array of matching user objects.
  * @throws Will log an error if the operation to find matching users fails.
  */
-
 async function getMatchingUsers(userId) {
     try {
         await connectDatabase()
@@ -425,7 +413,6 @@ async function getMatchingUsers(userId) {
  * @param {string} contactId - The ID of the contact to be added.
  * @throws Will log an error if the operation to add a contact fails.
  */
-
 async function addContact(userId, contactId) {
     try {
         await connectDatabase()
@@ -449,7 +436,6 @@ async function addContact(userId, contactId) {
  * @param {string} contactId - The ID of the contact to be removed.
  * @throws Will log an error if the operation to remove a contact fails.
  */
-
 async function removeContact(userId, contactId) {
     try {
         await connectDatabase()
@@ -476,7 +462,6 @@ async function removeContact(userId, contactId) {
  * @returns {Array<Object>} An array of contact objects if found, or an empty array if no contacts are available.
  * @throws Will log an error if the operation to retrieve contacts fails.
  */
-
 async function getContacts(userId) {
     try {
         await connectDatabase()
@@ -524,7 +509,6 @@ async function blockContact(userId, contactId) {
  * @param {Object} badge - The badge object to be created, containing its properties (e.g., name, description, criteria).
  * @throws Will log an error if the operation to create the badge fails.
  */
-
 async function createBadge(badge) {
     try {
         await connectDatabase()
@@ -543,7 +527,6 @@ async function createBadge(badge) {
  * @returns {Array<Object>} An array of badge objects.
  * @throws Will log an error if the operation to fetch badges fails.
  */
-
 async function getAllBadges() {
     try {
         await connectDatabase()
@@ -565,7 +548,6 @@ async function getAllBadges() {
  * @returns {Array<Object>} An array of badge objects, or an empty array if the user has no badges or does not exist.
  * @throws Will log an error if the operation to fetch user badges fails.
  */
-
 async function getUserBadges(userId) {
     try {
         await connectDatabase()
@@ -594,7 +576,6 @@ async function getUserBadges(userId) {
  * @param {Object} badge - The badge object to be awarded, including its properties (e.g., name, description).
  * @throws Will log an error if the operation to award the badge fails.
  */
-
 async function awardBadge(userId, badge) {
     try {
         await connectDatabase()
@@ -617,7 +598,6 @@ async function awardBadge(userId, badge) {
  * @function initializeBadges
  * @throws Will log an error if the badge initialization process fails.
  */
-
 async function initializeBadges() {
     try {
         await connectDatabase()
@@ -656,7 +636,6 @@ async function initializeBadges() {
  * @returns {Object} The result of the insert operation.
  * @throws Will log an error if the operation to save the message fails.
  */
-
 async function saveMessage(senderId, receiverId, message) {
     try {
         await connectDatabase()
@@ -681,7 +660,6 @@ async function saveMessage(senderId, receiverId, message) {
  * @returns {Array<Object>} An array of message objects representing the conversation.
  * @throws Will log an error if the operation to fetch the conversation fails.
  */
-
 async function getConversation(userId1, userId2) {
     try {
         await connectDatabase()
@@ -708,7 +686,6 @@ async function getConversation(userId1, userId2) {
  * @returns {Array<Object>} An array of message objects sent by the user.
  * @throws Will log an error if the operation to fetch messages fails.
  */
-
 async function getUserMessages(userId) {
     try {
         await connectDatabase()
@@ -728,7 +705,6 @@ async function getUserMessages(userId) {
  * @param {string} contactId - The ID of the contact to be blocked.
  * @throws Will log an error if the operation to block the contact fails.
  */
-
 async function blockContact(userId, contactId) {
     try {
         await connectDatabase()
@@ -739,6 +715,31 @@ async function blockContact(userId, contactId) {
         logInfo(`User: ${userId} successfully added: ${contactId}`)
     } catch (error) {
         logError(`Error blocking contact for userId: ${userId}, contactId: ${contactId} - ${error}`)
+    }
+}
+
+async function getBlockedContacts(userId) {
+    try {
+        await connectDatabase()
+        const user = await users.findOne(
+            { _id: new ObjectId(userId) }
+        )
+        if (!user) {
+            logInfo(`No user found with userId: ${userId}`)
+            return []
+        }
+        if (user.blockedContacts && user.blockedContacts.length > 0) {
+            const blockedContacts = await users.find(
+                { _id: { $in: user.blockedContacts.map(id => new ObjectId(id)) } }
+            ).toArray()
+
+            logInfo(`Retrieved ${blockedContacts.length} blocked contacts for userId: ${userId}`)
+            return blockedContacts
+        }
+        logInfo(`No blocked contacts found for userId: ${userId}`)
+        return []
+    } catch (error) {
+        logError(`Error retrieving blocked contacts for userId: ${userId} - ${error}`)
     }
 }
 
@@ -754,4 +755,5 @@ module.exports = {
     blockContact,
     getAllBadges, getUserBadges, awardBadge,
     saveMessage, getConversation, getUserMessages,
+    blockContact, getBlockedContacts
 }
