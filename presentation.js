@@ -452,6 +452,18 @@ app.get("/profile", attachSessionData, async (req, res) => {
     }
 })
 
+/**
+ * GET /contact-profile/:contactId
+ * Fetches the profile of a specific contact if the logged-in user is not blocked by the contact.
+ * If the user is blocked, a message is displayed instead.
+ *
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ * @param {string} req.params.contactId - The ID of the contact to fetch.
+ * @param {string} req.userId - The ID of the currently logged-in user (from session).
+ *
+ * @returns {void} Renders the "profile" view or sends an error response.
+ */
 app.get('/contact-profile/:contactId', attachSessionData, async (req, res) => {
     const contactId = req.params.contactId
     const loggedInUserId = req.userId
