@@ -60,10 +60,10 @@
   <div class="body flex-grow-1 px-3">
     <div class="container-lg">
       {{#if message}}
-      <div class="alert text-center m-2 {{#ifEquals type 
-                                'success'}}alert-success{{else}}alert-danger{{/ifEquals}}">
-        {{message}}
-      </div>
+          <div class="alert text-center {{#ifEquals type 
+          'success'}}alert-success{{else}}alert-danger{{/ifEquals}}">
+          {{message}}
+          </div>
       {{/if}}
       <table class="table table-striped my-4 justify-content-center text-center">
         <thead>
@@ -79,7 +79,6 @@
           {{#each matchingUsers}}
           <tr>
             <td>{{this.username}}</td>
-            {{!-- a problem in desplying the image --}}
             <td><img class="image" src="{{this.profilePicturePath}}" alt="{{this.username}}" class="profile-picture">
             </td>
             <td>
@@ -109,5 +108,4 @@
       </table>
     </div>
   </div>
-
 </body>

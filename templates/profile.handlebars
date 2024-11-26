@@ -90,6 +90,9 @@
         font-size: 14px;
         text-align: center;
     }
+    img{
+        width: 50px;
+    }
 </style>
 
 <body>
@@ -117,7 +120,10 @@
             <div class="badges-container">
                 {{#if badges}}
                 {{#each badges}}
-                <div class="badge">{{this.name}}</div>
+                <div>
+                    <img src="{{this.imageUrl}}" alt="{{this.name}}" class="badge-image" />
+                    <div class="badge-name">{{this.name}}</div>
+                </div>
                 {{/each}}
                 {{else}}
                 <div>You have not earned any badges yet</div>

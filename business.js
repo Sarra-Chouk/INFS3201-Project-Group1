@@ -218,6 +218,10 @@ async function addContact(userId, contactId) {
     await persistence.addContact(userId, contactId);
 }
 
+async function removeContact(userId, contactId) {
+    await persistence.removeContact(userId, contactId)
+}
+
 async function getProfile(userId) {
     const user = await persistence.getUserById(userId)
     if (!user) {
@@ -227,7 +231,7 @@ async function getProfile(userId) {
     return {
         username: user.username,
         email: user.email,
-        profilePicture: user.profilePicturePath || "/images/defaultProfilePicture.jpg",
+        profilePicture: user.profilePicturePath || "/profilePictures/defaultProfilePicture.jpg",
         badges: badges || []
     }
 }
@@ -314,7 +318,7 @@ module.exports = {
     startSession, getSession, deleteSession,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
     getMatchingUsers,
-    addContact, getContacts,
+    getContacts, addContact, removeContact,
     getProfile,
     getUserBadges, awardBadge,
     sendMessage, getConversation,
