@@ -238,7 +238,7 @@ async function getProfile(userId) {
     return {
         username: user.username,
         email: user.email,
-        profilePicture: user.profilePicturePath || "/images/defaultProfilePicture.jpg",
+        profilePicture: user.profilePicturePath || "/profilePictures/defaultProfilePicture.jpg",
         badges: badges || []
     }
 }

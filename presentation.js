@@ -25,8 +25,9 @@ app.set("view engine", "handlebars")
 app.engine("handlebars", hbs.engine)
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(cookieParser())
-app.use('/images', express.static(__dirname + "/static/profilePictures"))
+app.use('/profilePictures', express.static(__dirname + "/static/profilePictures"))
 app.use('/badges', express.static(__dirname + '/static/badges'))
+app.use('/images', express.static(__dirname + '/static'))
 app.use(fileUpload())
 
 app.get("/index", (req, res) => {
@@ -89,10 +90,10 @@ app.post("/sign-up", async (req, res) => {
             throw new Error(isProfilePictureValid.message)
         }
 
-        let profilePicturePath = "/images/defaultProfilePicture.png"
+        let profilePicturePath = "/profilePictures/defaultProfilePicture.png"
         if (profilePicture) {
             const uniqueFileName = `${Date.now()}_${profilePicture.name}`
-            profilePicturePath = `/images/${uniqueFileName}`
+            profilePicturePath = `/profilePictures/${uniqueFileName}`
             await profilePicture.mv(`${__dirname}/static/profilePictures/${uniqueFileName}`)
         }
 
@@ -292,7 +293,7 @@ app.get("/add-contact/:contactId", attachSessionData, async (req, res) => {
         const userId = req.userId
 
         await business.addContact(userId, contactId)
-        res.redirect(`/dashboard?message=${encodeURIComponent("Contact was added successfully!.")}&type=success`)
+        res.redirect(`/dashboard?message=${encodeURIComponent("Contact was added successfully!")}&type=success`)
     } catch (error) {
         console.error("Error fetching conversation:", error.message)
     }
@@ -300,14 +301,14 @@ app.get("/add-contact/:contactId", attachSessionData, async (req, res) => {
 
 app.get("/my-contacts", attachSessionData, async (req, res) => {
 
-    const userId = req.userId;
+    const userId = req.userId
 
     try {
-      const contacts = await business.getContacts(userId);
+      const contacts = await business.getContacts(userId)
       
       res.render('myContacts', {
         contacts: contacts
-      });
+      })
     } catch (err) {
       res.status(500).send('Error fetching data');
     }
