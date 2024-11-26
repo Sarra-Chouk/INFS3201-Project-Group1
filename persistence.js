@@ -487,6 +487,19 @@ async function getContacts(userId) {
     }
 }
 
+async function blockContact(userId, contactId) {
+    try {
+        await connectDatabase()
+        await users.updateOne(
+            { _id: new ObjectId(userId) },
+            { $addToSet: { blockedContacts: contactId } }
+        )
+        logInfo(`User: ${userId} successfully added: ${contactId}`)
+    } catch (error) {
+        logError(`Error blocking contact for userId: ${userId}, contactId: ${contactId} - ${error}`)
+    }
+}
+
 /**
  * Creates a new badge in the database.
  *
@@ -722,7 +735,7 @@ module.exports = {
     saveSession, getSession, deleteSession, updateSession,
     getMatchingUsers,
     addContact, removeContact, getContacts,
+    blockContact,
     getAllBadges, getUserBadges, awardBadge,
     saveMessage, getConversation, getUserMessages,
-    blockContact
 }
