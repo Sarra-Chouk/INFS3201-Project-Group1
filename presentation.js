@@ -218,7 +218,7 @@ app.post("/login", async (req, res) => {
 
         const sessionKey = await business.startSession(loginResult.userId)
         res.cookie("sessionKey", sessionKey, { httpOnly: true })
-        res.redirect("/dashboard")
+        res.redirect("/dashboard?message=" + encodeURIComponent("Welcome to GlobeLingo!") + "&type=success")
 
     } catch (error) {
 
@@ -448,7 +448,7 @@ app.get("/logout", async (req, res) => {
             res.clearCookie("sessionKey")
         }
 
-        res.redirect("/login?message=" + encodeURIComponent("You have been logged out."))
+        res.redirect(`/login?message=${encodeURIComponent("You have been logged out.")}&type=success`)
 
     } catch (error) {
 

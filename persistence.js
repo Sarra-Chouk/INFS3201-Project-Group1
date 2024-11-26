@@ -1,7 +1,21 @@
+/**
+ * Logs informational messages to the console with optional details.
+ *
+ * @function logInfo
+ * @param {string} message - The informational message to log.
+ * @param {Object} [details={}] - Additional details to include with the log message.
+ */
 function logInfo(message, details = {}) {
     console.log(`[INFO] ${message}`, Object.keys(details).length ? details : '')
 }
 
+/**
+ * Logs error messages to the console with optional error details.
+ *
+ * @function logError
+ * @param {string} message - The error message to log.
+ * @param {Error|string} error - The error object or message to include with the log.
+ */
 function logError(message, error) {
     console.error(`[ERROR] ${message}`, error?.message || error)
 }
@@ -15,6 +29,14 @@ let sessions = undefined
 let messages = undefined
 let badges = undefined
 
+/**
+ * Establishes a connection to the MongoDB database if not already connected.
+ * Initializes the database and its collections for use.
+ *
+ * @async
+ * @function connectDatabase
+ * @throws Will log an error if the connection to the database fails.
+ */
 async function connectDatabase() {
     if (!client) {
         try {
@@ -32,6 +54,15 @@ async function connectDatabase() {
     }
 }
 
+/**
+ * Updates specific fields of a user in the database based on their email.
+ *
+ * @async
+ * @function updateUserField
+ * @param {string} email - The email address of the user to update.
+ * @param {Object} updates - An object containing the fields to update and their new values.
+ * @throws Will log an error if the update operation fails.
+ */
 async function updateUserField(email, updates) {
     try {
         await connectDatabase()
@@ -48,6 +79,17 @@ async function updateUserField(email, updates) {
     }
 }
 
+/**
+ * Retrieves a user from the database by their unique ID.
+ *
+ * @async
+ * @function getUserById
+ * @param {string} userId - The unique ID of the user to retrieve.
+ * @returns {Object|null} The user object if found, or `null` if not found.
+ * @throws Will log an error if the retrieval operation fails.
+ */
+
+
 async function getUserById(userId) {
     try {
         await connectDatabase()
@@ -63,6 +105,15 @@ async function getUserById(userId) {
     }
 }
 
+/**
+ * Retrieves a user from the database by their email address.
+ *
+ * @async
+ * @function getUserByEmail
+ * @param {string} email - The email address of the user to retrieve.
+ * @returns {Object|null} The user object if found, or `null` if not found.
+ * @throws Will log an error if the retrieval operation fails.
+ */
 async function getUserByEmail(email) {
     try {
         await connectDatabase()
@@ -78,6 +129,15 @@ async function getUserByEmail(email) {
     }
 }
 
+/**
+ * Retrieves a user from the database by their username.
+ *
+ * @async
+ * @function getUserByUsername
+ * @param {string} username - The username of the user to retrieve.
+ * @returns {Object|null} The user object if found, or `null` if not found.
+ * @throws Will log an error if the retrieval operation fails.
+ */
 async function getUserByUsername(username) {
     try {
         await connectDatabase()
@@ -93,6 +153,16 @@ async function getUserByUsername(username) {
     }
 }
 
+/**
+ * Creates a new user in the database.
+ *
+ * @async
+ * @function createUser
+ * @param {Object} user - The user object to be inserted into the database.
+ * @returns {string|null} The ID of the newly created user, or `null` if the operation fails.
+ * @throws Will log an error if the user creation operation fails.
+ */
+
 async function createUser(user) {
     try {
         await connectDatabase()
@@ -103,6 +173,17 @@ async function createUser(user) {
         logError("Error creating user", error)
     }
 }
+
+/**
+ * Stores a key with an expiry time for a specific user in the database.
+ *
+ * @async
+ * @function storeKey
+ * @param {string} email - The email of the user to associate with the key.
+ * @param {string} key - The key to be stored.
+ * @param {string} type - The type of key being stored (e.g., "reset", "verification").
+ * @throws Will log an error if the key storage operation fails.
+ */
 
 async function storeKey(email, key, type) {
     try {
@@ -119,6 +200,17 @@ async function storeKey(email, key, type) {
         logError(`Error storing ${type} key for email: ${email} - ${error}`)
     }
 }
+
+/**
+ * Retrieves a user from the database by a specific key and type.
+ *
+ * @async
+ * @function getUserByKey
+ * @param {string} key - The key to search for.
+ * @param {string} type - The type of key being searched (e.g., "reset", "verification").
+ * @returns {Object|null} The user object if found and the key is valid, or `null` if not found or expired.
+ * @throws Will log an error if the retrieval operation fails.
+ */
 
 async function getUserByKey(key, type) {
     try {
@@ -140,6 +232,16 @@ async function getUserByKey(key, type) {
     }
 }
 
+/**
+ * Clears a specific key for a user in the database.
+ *
+ * @async
+ * @function clearKey
+ * @param {string} email - The email of the user whose key should be cleared.
+ * @param {string} type - The type of key to clear (e.g., "reset", "verification").
+ * @throws Will log an error if the key clearing operation fails.
+ */
+
 async function clearKey(email, type) {
     try {
         await connectDatabase()
@@ -153,6 +255,17 @@ async function clearKey(email, type) {
         logError(`Error clearing ${type} key for email: ${email} - ${error}`)
     }
 }
+
+/**
+ * Updates the password for a user in the database.
+ *
+ * @async
+ * @function updatePassword
+ * @param {string} email - The email of the user whose password should be updated.
+ * @param {string} newPassword - The new password to set for the user.
+ * @returns {boolean} `true` if the password was successfully updated, `false` otherwise.
+ * @throws Will log an error if the password update operation fails.
+ */
 
 async function updatePassword(email, newPassword) {
     try {
@@ -170,6 +283,15 @@ async function updatePassword(email, newPassword) {
     }
 }
 
+/**
+ * Saves a session object to the database.
+ *
+ * @async
+ * @function saveSession
+ * @param {Object} session - The session object to be saved, including properties like sessionKey and other metadata.
+ * @throws Will log an error if the session saving operation fails.
+ */
+
 async function saveSession(session) {
     try {
         await connectDatabase()
@@ -179,6 +301,16 @@ async function saveSession(session) {
         logError(`Error saving session with sessionKey: ${session.sessionKey} - ${error}`)
     }
 }
+
+/**
+ * Retrieves a session from the database by its session key.
+ *
+ * @async
+ * @function getSession
+ * @param {string} key - The session key used to retrieve the session.
+ * @returns {Object|null} The session data if found and valid, or `null` if not found or expired.
+ * @throws Will log an error if the session retrieval operation fails.
+ */
 
 async function getSession(key) {
     try {
@@ -199,6 +331,15 @@ async function getSession(key) {
     }
 }
 
+/**
+ * Deletes a session from the database by its session key.
+ *
+ * @async
+ * @function deleteSession
+ * @param {string} key - The session key of the session to be deleted.
+ * @throws Will log an error if the session deletion operation fails.
+ */
+
 async function deleteSession(key) {
     try {
         await connectDatabase()
@@ -212,6 +353,16 @@ async function deleteSession(key) {
         logError(`Error deleting session for sessionKey: ${key} - ${error}`)
     }
 }
+
+/**
+ * Updates the data of an existing session in the database by its session key.
+ *
+ * @async
+ * @function updateSession
+ * @param {string} key - The session key of the session to be updated.
+ * @param {Object} data - The data to be merged into the existing session data.
+ * @throws Will log an error if the session update operation fails.
+ */
 
 async function updateSession(key, data) {
     try {
@@ -235,6 +386,16 @@ async function updateSession(key, data) {
     }
 }
 
+/**
+ * Finds users whose known languages match the learning languages of a specified user.
+ *
+ * @async
+ * @function getMatchingUsers
+ * @param {string} userId - The ID of the user for whom matching users are to be found.
+ * @returns {Array<Object>} An array of matching user objects.
+ * @throws Will log an error if the operation to find matching users fails.
+ */
+
 async function getMatchingUsers(userId) {
     try {
         await connectDatabase()
@@ -255,6 +416,16 @@ async function getMatchingUsers(userId) {
     }
 }
 
+/**
+ * Adds a contact to a user's contact list in the database.
+ *
+ * @async
+ * @function addContact
+ * @param {string} userId - The ID of the user to whom the contact will be added.
+ * @param {string} contactId - The ID of the contact to be added.
+ * @throws Will log an error if the operation to add a contact fails.
+ */
+
 async function addContact(userId, contactId) {
     try {
         await connectDatabase()
@@ -268,6 +439,16 @@ async function addContact(userId, contactId) {
         logError(`Error adding contact for userId: ${userId}, contactId: ${contactId} - ${error}`)
     }
 }
+
+/**
+ * Removes a contact from a user's contact list in the database.
+ *
+ * @async
+ * @function removeContact
+ * @param {string} userId - The ID of the user from whose contact list the contact will be removed.
+ * @param {string} contactId - The ID of the contact to be removed.
+ * @throws Will log an error if the operation to remove a contact fails.
+ */
 
 async function removeContact(userId, contactId) {
     try {
@@ -285,6 +466,16 @@ async function removeContact(userId, contactId) {
         logError(`Error removing contact for userId: ${userId}, contactId: ${contactId} - ${error}`)
     }
 }
+
+/**
+ * Retrieves the list of contacts for a specific user from the database.
+ *
+ * @async
+ * @function getContacts
+ * @param {string} userId - The ID of the user whose contacts are to be retrieved.
+ * @returns {Array<Object>} An array of contact objects if found, or an empty array if no contacts are available.
+ * @throws Will log an error if the operation to retrieve contacts fails.
+ */
 
 async function getContacts(userId) {
     try {
@@ -310,6 +501,30 @@ async function getContacts(userId) {
     }
 }
 
+
+
+async function blockContact(userId, contactId) {
+    try {
+        await connectDatabase()
+        await users.updateOne(
+            { _id: new ObjectId(userId) },
+            { $addToSet: { blockedContacts: contactId } }
+        )
+        logInfo(`User: ${userId} successfully added: ${contactId}`)
+    } catch (error) {
+        logError(`Error blocking contact for userId: ${userId}, contactId: ${contactId} - ${error}`)
+    }
+}
+
+/**
+ * Creates a new badge in the database.
+ *
+ * @async
+ * @function createBadge
+ * @param {Object} badge - The badge object to be created, containing its properties (e.g., name, description, criteria).
+ * @throws Will log an error if the operation to create the badge fails.
+ */
+
 async function createBadge(badge) {
     try {
         await connectDatabase()
@@ -319,6 +534,15 @@ async function createBadge(badge) {
         logError(`Error creating badge - ${error}`)
     }
 }
+
+/**
+ * Retrieves all badges from the database.
+ *
+ * @async
+ * @function getAllBadges
+ * @returns {Array<Object>} An array of badge objects.
+ * @throws Will log an error if the operation to fetch badges fails.
+ */
 
 async function getAllBadges() {
     try {
@@ -331,6 +555,16 @@ async function getAllBadges() {
         return []
     }
 }
+
+/**
+ * Retrieves the badges associated with a specific user from the database.
+ *
+ * @async
+ * @function getUserBadges
+ * @param {string} userId - The ID of the user whose badges are to be retrieved.
+ * @returns {Array<Object>} An array of badge objects, or an empty array if the user has no badges or does not exist.
+ * @throws Will log an error if the operation to fetch user badges fails.
+ */
 
 async function getUserBadges(userId) {
     try {
@@ -351,6 +585,16 @@ async function getUserBadges(userId) {
     }
 }
 
+/**
+ * Awards a badge to a specific user by adding it to their list of badges in the database.
+ *
+ * @async
+ * @function awardBadge
+ * @param {string} userId - The ID of the user to whom the badge will be awarded.
+ * @param {Object} badge - The badge object to be awarded, including its properties (e.g., name, description).
+ * @throws Will log an error if the operation to award the badge fails.
+ */
+
 async function awardBadge(userId, badge) {
     try {
         await connectDatabase()
@@ -365,6 +609,14 @@ async function awardBadge(userId, badge) {
         logError(`Error awarding badge to userId: ${userId} - ${error}`)
     }
 }
+
+/**
+ * Initializes a predefined set of badges in the database if they do not already exist.
+ *
+ * @async
+ * @function initializeBadges
+ * @throws Will log an error if the badge initialization process fails.
+ */
 
 async function initializeBadges() {
     try {
@@ -393,6 +645,18 @@ async function initializeBadges() {
     }
 }
 
+/**
+ * Saves a message in the database between a sender and a receiver.
+ *
+ * @async
+ * @function saveMessage
+ * @param {string} senderId - The ID of the user sending the message.
+ * @param {string} receiverId - The ID of the user receiving the message.
+ * @param {string} message - The content of the message.
+ * @returns {Object} The result of the insert operation.
+ * @throws Will log an error if the operation to save the message fails.
+ */
+
 async function saveMessage(senderId, receiverId, message) {
     try {
         await connectDatabase()
@@ -406,6 +670,17 @@ async function saveMessage(senderId, receiverId, message) {
         logError(`Error saving message from senderId: ${senderId} to receiverId: ${receiverId} - ${error}`)
     }
 }
+
+/**
+ * Retrieves the conversation between two users, sorted by timestamp in ascending order.
+ *
+ * @async
+ * @function getConversation
+ * @param {string} userId1 - The ID of the first user in the conversation.
+ * @param {string} userId2 - The ID of the second user in the conversation.
+ * @returns {Array<Object>} An array of message objects representing the conversation.
+ * @throws Will log an error if the operation to fetch the conversation fails.
+ */
 
 async function getConversation(userId1, userId2) {
     try {
@@ -424,6 +699,16 @@ async function getConversation(userId1, userId2) {
     }
 }
 
+/**
+ * Retrieves all messages sent by a specific user.
+ *
+ * @async
+ * @function getUserMessages
+ * @param {string} userId - The ID of the user whose messages are to be retrieved.
+ * @returns {Array<Object>} An array of message objects sent by the user.
+ * @throws Will log an error if the operation to fetch messages fails.
+ */
+
 async function getUserMessages(userId) {
     try {
         await connectDatabase()
@@ -433,6 +718,16 @@ async function getUserMessages(userId) {
         logError(`Error fetching messages for userId: ${userId} - ${error}`)
     }
 }
+
+/**
+ * Blocks a contact for a specific user by adding the contact ID to the user's blocked contacts list.
+ *
+ * @async
+ * @function blockContact
+ * @param {string} userId - The ID of the user who wants to block the contact.
+ * @param {string} contactId - The ID of the contact to be blocked.
+ * @throws Will log an error if the operation to block the contact fails.
+ */
 
 async function blockContact(userId, contactId) {
     try {
@@ -481,6 +776,7 @@ module.exports = {
     saveSession, getSession, deleteSession, updateSession,
     getMatchingUsers,
     addContact, removeContact, getContacts,
+    blockContact,
     getAllBadges, getUserBadges, awardBadge,
     saveMessage, getConversation, getUserMessages,
     blockContact, getBlockedContacts
