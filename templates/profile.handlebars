@@ -2,7 +2,7 @@
     .body {
         height: 100%;
     }
-    
+
     .sidebar-nav {
         height: 100%;
         background-color: #f8f9fa;
@@ -90,13 +90,13 @@
         font-size: 14px;
         text-align: center;
     }
-    img{
+
+    img {
         width: 50px;
     }
 </style>
 
 <body>
-
     <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
         <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
         </li>
@@ -111,6 +111,11 @@
     </ul>
     </div>
     <div class="main-content">
+        {{#if isBlocked}}
+        <div class="alert alert-danger text-center">
+            {{message}}
+        </div>
+        {{else}}
         <div class="profile-container">
             <img src="{{profilePicture}}" alt="Profile Picture" class="profile-picture">
             <div class="profile-username">{{username}}</div>
@@ -130,5 +135,6 @@
                 {{/if}}
             </div>
         </div>
+        {{/if}}
     </div>
 </body>

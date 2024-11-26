@@ -454,16 +454,25 @@ app.get("/profile", attachSessionData, async (req, res) => {
 
 app.get('/contact-profile/:contactId', attachSessionData, async (req, res) => {
     const contactId = req.params.contactId
+    const loggedInUserId = req.userId
 
     try {
-        const contactProfile = await business.getProfile(contactId)
+        const isBlocked = await business.isBlocked(loggedInUserId, contactId);
 
+        if (isBlocked) {
+            return res.render('profile', {
+                isBlocked: true,
+                message: "You are blocked by this user and cannot view their profile."
+            })
+        }
+        const contactProfile = await business.getProfile(contactId)
         res.render('profile', {
+            isBlocked: false,
             username: contactProfile.username,
             email: contactProfile.email,
             profilePicture: contactProfile.profilePicture,
             badges: contactProfile.badges
-        });
+        })
     } catch (error) {
         console.error('Error fetching contact profile:', error.message)
         res.status(500).send('An error occurred while fetching the contact profile.')

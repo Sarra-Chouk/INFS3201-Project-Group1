@@ -546,6 +546,19 @@ async function getProfile(userId) {
     }
 }
 
+async function isBlocked(loggedInUserId, contactId) {
+    try {
+        const contactProfile = await persistence.getUserById(contactId)
+        if (contactProfile.blockedContacts && contactProfile.blockedContacts.includes(loggedInUserId)) {
+            return true
+        }
+
+        return false
+    } catch (error) {
+        console.error(`Error checking block status: ${error.message}`)
+        throw new Error("Failed to determine block status")
+    }
+}
 
 /**
  * Retrieves the badges associated with a specific user.
@@ -699,7 +712,7 @@ module.exports = {
     startSession, getSession, deleteSession,
     storeResetKey, getUserByResetKey, sendPasswordResetEmail, resetPassword, updatePassword,
     getMatchingUsers,
-    getContacts, addContact, removeContact, blockContact,
+    getContacts, addContact, removeContact, blockContact, isBlocked,
     getProfile,
     getUserBadges, awardBadge,
     sendMessage, getConversation,
