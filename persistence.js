@@ -739,6 +739,23 @@ async function getBlockedContacts(userId) {
     }
 }
 
+async function unblockContact(userId, contactId) {
+    try {
+        await connectDatabase()
+        const result = await users.updateOne(
+            { _id: new ObjectId(userId) },
+            { $pull: { blockedContacts: contactId } }
+        );
+        if (result.modifiedCount > 0) {
+            logInfo(`Contact unblocked successfully: userId = ${userId}, contactId = ${contactId}`)
+        } else {
+            logInfo(`No changes made. Contact not found in user's blocked list: userId = ${userId}, contactId = ${contactId}`)
+        }
+    } catch (error) {
+        logError(`Error unblocking contact for userId: ${userId}, contactId: ${contactId} - ${error}`)
+    }
+}
+
 module.exports = {
     updateUserField,
     getUserById, getUserByUsername, getUserByEmail,
@@ -751,5 +768,5 @@ module.exports = {
     blockContact,
     getAllBadges, getUserBadges, awardBadge,
     saveMessage, getConversation, getUserMessages,
-    blockContact, getBlockedContacts
+    blockContact, getBlockedContacts, unblockContact
 }

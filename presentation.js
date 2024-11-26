@@ -349,6 +349,18 @@ app.get("/block-contact/:contactId", attachSessionData, async (req, res) => {
     }
 })
 
+app.post("/unblock-contact/:contactId", attachSessionData, async (req, res) => {
+    const userId = req.userId
+    const contactId = req.params.contactId
+
+    try {
+        await business.unblockContact(userId, contactId)
+        res.redirect(`/blocked-contacts?message=${encodeURIComponent("Contact unblocked successfully!")}&type=success`)
+    } catch (err) {
+        console.error(`Error unblocking contact: ${err.message}`)
+        res.redirect(`/dashboard?message=${encodeURIComponent("An error occurred while unblocking the contact.")}&type=error`)
+    }
+})
 
 app.get("/blocked-contacts", attachSessionData, async (req, res) => {
     const userId = req.userId
