@@ -288,6 +288,39 @@ app.get("/profile", attachSessionData, async (req, res) => {
     }
 })
 
+app.get("/my-contacts", attachSessionData, async (req, res) => {
+
+    const userId = req.userId
+    const message = req.query.message
+    const type = req.query.type
+
+    try {
+      const contacts = await business.getContacts(userId)
+      
+      res.render('myContacts', {
+        contacts: contacts,
+        message: message,
+        type: type
+      })
+    } catch (err) {
+      res.status(500).send('Error fetching data');
+    }
+})
+
+app.post("/remove-contact/:contactId", attachSessionData, async (req, res) => {
+    try {
+        const contactId = req.params.contactId
+        const userId = req.userId
+
+        await business.removeContact(userId, contactId)
+
+        res.redirect(`/my-contacts?message=${encodeURIComponent("Contact removed successfully!")}&type=success`)
+    } catch (error) {
+        console.error("Error removing contact:", error.message)
+        res.redirect(`/my-contacts?message=${encodeURIComponent("An error occurred while removing the contact.")}&type=error`)
+    }
+})
+
 app.get("/add-contact/:contactId", attachSessionData, async (req, res) => {
     try {
         const contactId = req.params.contactId
@@ -297,21 +330,6 @@ app.get("/add-contact/:contactId", attachSessionData, async (req, res) => {
         res.redirect(`/dashboard?message=${encodeURIComponent("Contact was added successfully!")}&type=success`)
     } catch (error) {
         console.error("Error fetching conversation:", error.message)
-    }
-})
-
-app.get("/my-contacts", attachSessionData, async (req, res) => {
-
-    const userId = req.userId
-
-    try {
-      const contacts = await business.getContacts(userId)
-      
-      res.render('myContacts', {
-        contacts: contacts
-      })
-    } catch (err) {
-      res.status(500).send('Error fetching data');
     }
 })
 
