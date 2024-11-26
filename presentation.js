@@ -455,7 +455,6 @@ app.get("/profile", attachSessionData, async (req, res) => {
 app.get('/contact-profile/:contactId', attachSessionData, async (req, res) => {
     const contactId = req.params.contactId
     const loggedInUserId = req.userId
-
     try {
         const isBlocked = await business.isBlocked(loggedInUserId, contactId);
 
@@ -465,7 +464,7 @@ app.get('/contact-profile/:contactId', attachSessionData, async (req, res) => {
                 message: "You are blocked by this user and cannot view their profile."
             })
         }
-        const contactProfile = await business.getProfile(contactId)
+        const contactProfile = await business.getProfile(contactId);
         res.render('profile', {
             isBlocked: false,
             username: contactProfile.username,

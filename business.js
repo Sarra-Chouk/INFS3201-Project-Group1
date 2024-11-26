@@ -549,11 +549,19 @@ async function getProfile(userId) {
 async function isBlocked(loggedInUserId, contactId) {
     try {
         const contactProfile = await persistence.getUserById(contactId)
-        if (contactProfile.blockedContacts && contactProfile.blockedContacts.includes(loggedInUserId)) {
-            return true
+        if (!contactProfile) {
+            console.error("Contact profile not found")
+            return false;
         }
-
-        return false
+        if (
+            contactProfile.blockedContacts &&
+            contactProfile.blockedContacts.some(id => id.toString() === loggedInUserId.toString())
+        ) {
+            console.log(`User ${loggedInUserId} is blocked by ${contactId}`)
+            return true;
+        }
+        console.log(`User ${loggedInUserId} is NOT blocked by ${contactId}`)
+        return false;
     } catch (error) {
         console.error(`Error checking block status: ${error.message}`)
         throw new Error("Failed to determine block status")
