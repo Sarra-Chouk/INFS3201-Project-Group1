@@ -77,7 +77,9 @@
                 <tbody>
                     {{#each contacts}}
                     <tr>
-                        <td>{{this.username}}</td>
+                        <td>
+                            <a href="/contact-profile/{{this._id}}" class="contact-link">{{this.username}}</a>
+                        </td>
                         <td><img class="image" src="{{this.profilePicturePath}}" alt="{{this.username}}"
                                 class="profile-picture">
                         </td>
