@@ -452,6 +452,24 @@ app.get("/profile", attachSessionData, async (req, res) => {
     }
 })
 
+app.get('/contact-profile/:contactId', attachSessionData, async (req, res) => {
+    const contactId = req.params.contactId
+
+    try {
+        const contactProfile = await business.getProfile(contactId)
+
+        res.render('profile', {
+            username: contactProfile.username,
+            email: contactProfile.email,
+            profilePicture: contactProfile.profilePicture,
+            badges: contactProfile.badges
+        });
+    } catch (error) {
+        console.error('Error fetching contact profile:', error.message)
+        res.status(500).send('An error occurred while fetching the contact profile.')
+    }
+})
+
 /**
  * Route handler for the "/my-contacts" page.
  * Fetches and renders the user's contacts.
