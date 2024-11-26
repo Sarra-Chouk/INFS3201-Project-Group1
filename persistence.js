@@ -1,7 +1,21 @@
+/**
+ * Logs informational messages to the console with optional details.
+ *
+ * @function logInfo
+ * @param {string} message - The informational message to log.
+ * @param {Object} [details={}] - Additional details to include with the log message.
+ */
 function logInfo(message, details = {}) {
     console.log(`[INFO] ${message}`, Object.keys(details).length ? details : '')
 }
 
+/**
+ * Logs error messages to the console with optional error details.
+ *
+ * @function logError
+ * @param {string} message - The error message to log.
+ * @param {Error|string} error - The error object or message to include with the log.
+ */
 function logError(message, error) {
     console.error(`[ERROR] ${message}`, error?.message || error)
 }
@@ -486,6 +500,8 @@ async function getContacts(userId) {
         logError(`Error retrieving contacts for userId: ${userId} - ${error}`)
     }
 }
+
+
 
 async function blockContact(userId, contactId) {
     try {
