@@ -3,6 +3,14 @@
         height: 100%;
     }
 
+    .welcome-message {
+        position: absolute;
+        top: 22px;
+        right: 15px;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
     .sidebar-nav {
         height: 100%;
         background-color: #f8f9fa;
@@ -28,9 +36,16 @@
         background-color: #545cf9;
         color: white;
     }
+
+    .image {
+        width: 50px;
+    }
 </style>
 
 <body class="bg-light d-flex flex-column min-vh-100">
+    <div class="welcome-message">
+        <span>Welcome, {{username}}</span>
+    </div>
     <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
         <li class="nav-item"><a class="nav-link" href="/dashboard"><i class="bi bi-speedometer2 me-2"></i>Dashboard</a>
         </li>
@@ -40,14 +55,51 @@
         </li>
         <li class="nav-item"><a class="nav-link" href="/blocked-contacts"><i class="bi bi-person-x me-2"></i>Blocked
                 Contacts</a></li>
-        <li class="nav-item"><a class="nav-link" href="/badges"><i class="bi bi-patch-check me-2"></i>Badges</a>
-        </li>
+        <li class="nav-item"><a class="nav-link" href="/badges"><i class="bi bi-patch-check me-2"></i>Badges</a></li>
     </ul>
     </div>
 
     <div class="body flex-grow-1 px-3">
         <div class="container-lg">
-            <h1>My Contacts</h1>
+            <table class="table table-striped my-4 justify-content-center text-center">
+                <thead>
+                    <tr>
+                        <th scope="col">Username</th>
+                        <th scope="col">Profile Picture</th>
+                        <th scope="col">Known Languages</th>
+                        <th scope="col">Learning Languages</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each contacts}}
+                    <tr>
+                        <td>{{this.username}}</td>
+                        {{!-- a problem in desplying the image --}}
+                        <td><img class="image" src="{{this.profilePicturePath}}" alt="{{this.username}}"
+                                class="profile-picture">
+                        </td>
+                        <td>
+                            {{#each this.knownLanguages}}
+                            {{this}}{{#unless @last}}, {{/unless}}
+                            {{/each}}
+                        </td>
+                        <td>
+                            {{#each this.learningLanguages}}
+                            {{this}}{{#unless @last}}, {{/unless}}
+                            {{/each}}
+                        </td>
+                        <td>
+                            <form action="/conversation/{{this._id}}">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="bi bi-send m-2"></i>Send a Message
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                    {{/each}}
+                </tbody>
+            </table>
         </div>
     </div>
 

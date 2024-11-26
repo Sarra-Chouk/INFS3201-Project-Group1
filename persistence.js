@@ -39,9 +39,7 @@ async function getUserById(userId) {
     try {
         await connectDatabase();
         const user = await users.findOne(
-            { _id: new ObjectId(userId) },
-            { projection: { username: 1, email: 1, profilePicturePath: 1 } } 
-        )
+            { _id: new ObjectId(userId) })
         return user
     } catch (error) {
         console.error("Error fetching user by ID:", error.message)
@@ -203,11 +201,11 @@ async function getMatchingUsers(userId){
 async function addContact(userId, contactId) {
     try {
         await connectDatabase()
+
         await users.updateOne(
             { _id: new ObjectId(userId) },
             { $addToSet: { contacts: contactId } } 
         )
-        console.log(`Contact ${contactId} added to user ${userId}'s contact list.`)
     } catch (error) {
         console.error("Error adding contact:", error)
     }
@@ -230,14 +228,12 @@ async function getContacts(userId) {
     try {
         await connectDatabase();
         const user = await users.findOne(
-            { _id: new ObjectId(userId) },
-            { projection: { contacts: 1 } } 
+            { _id: new ObjectId(userId) }
         )
-        if (user) {
-            if (user.contacts) {
-                return user.contacts
-            }
-            return []
+        if (user && user.contacts && user.contacts.length > 0) {
+            const contacts = await users.find({ _id: { $in: user.contacts.map(id => new ObjectId(id)) } }).toArray();
+
+            return contacts
         } 
         return []   
     } catch (error) {

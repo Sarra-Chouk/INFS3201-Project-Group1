@@ -3,7 +3,7 @@
     height: 100%;
   }
 
-   .welcome-message {
+  .welcome-message {
     position: absolute;
     top: 22px;
     right: 15px;
@@ -43,7 +43,7 @@
 </style>
 
 <body class="bg-light d-flex flex-column min-vh-100">
-   <div class="welcome-message">
+  <div class="welcome-message">
     <span>Welcome, {{username}}</span>
   </div>
   <ul class="sidebar-nav" data-coreui="navigation" data-simplebar="">
@@ -59,6 +59,12 @@
 
   <div class="body flex-grow-1 px-3">
     <div class="container-lg">
+      {{#if message}}
+      <div class="alert text-center m-2 {{#ifEquals type 
+                                'success'}}alert-success{{else}}alert-danger{{/ifEquals}}">
+        {{message}}
+      </div>
+      {{/if}}
       <table class="table table-striped my-4 justify-content-center text-center">
         <thead>
           <tr>
@@ -87,8 +93,13 @@
               {{/each}}
             </td>
             <td>
-              <button class="btn btn-success btn-sm">Add Contact</button>
-              <button class="btn btn-danger btn-sm">Block Contact</button>
+              <form action="/add-contact/{{this._id}}">
+                <button class="btn btn-success btn-sm">
+                  <i class="bi bi-person-plus-fill m-1"></i>Add Contact
+                </button>
+                <form action="/block-contact/{{this._id}}">
+                  <button class="btn btn-danger btn-sm"><i class="bi bi-ban m-1"></i>Block Contact</button>
+                </form>
             </td>
           </tr>
           {{/each}}
