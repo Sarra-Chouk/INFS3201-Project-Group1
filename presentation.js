@@ -569,6 +569,19 @@ app.get("/block-contact/:contactId", attachSessionData, async (req, res) => {
     }
 })
 
+app.post("/unblock-contact/:contactId", attachSessionData, async (req, res) => {
+    const userId = req.userId
+    const contactId = req.params.contactId
+
+    try {
+        await business.unblockContact(userId, contactId)
+        res.redirect(`/blocked-contacts?message=${encodeURIComponent("Contact unblocked successfully!")}&type=success`)
+    } catch (err) {
+        console.error(`Error unblocking contact: ${err.message}`)
+        res.redirect(`/blocked-contacts?message=${encodeURIComponent("An error occurred while unblocking the contact.")}&type=error`)
+    }
+})
+
 /**
  * Route handler for the "/blocked-contacts" page.
  * Fetches and renders the list of blocked contacts for the user.
