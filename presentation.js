@@ -11,6 +11,11 @@ const hbs = handlebars.create({
     helpers: {
         ifEquals: (arg1, arg2, options) => {
             return (arg1 === arg2) ? options.fn(this) : options.inverse(this)
+        },
+        formatDate: function(date) {
+            const options = { hour: '2-digit', minute: '2-digit', hour12: true }
+            const formattedDate = new Date(date).toLocaleTimeString([], options)
+            return formattedDate
         }
     }
 })
@@ -235,7 +240,7 @@ async function attachSessionData(req, res, next) {
 
         const sessionData = await business.getSession(sessionKey)
         if (!sessionData || !sessionData.userId) {
-            return res.redirect("/login?message=" + encodeURIComponent("Invalid session. Please log in again.") + "&type=error")
+            return res.redirect("/login?message=" + encodeURIComponent("Your session has expired. Please log in again.") + "&type=error")
         }
         req.userId = sessionData.userId
         next()
@@ -337,28 +342,48 @@ app.post("/update-password", async (req, res) => {
     } 
 })
 
-app.get('/conversation/:contactId', attachSessionData, async (req, res) => {
+app.get('/conversation/:receiverId', attachSessionData, async (req, res) => {
     try {
-        const contactId = req.params.contactId
-        const userId = req.userId
 
-        const conversation = await business.getConversation(userId, contactId)
-        res.render('conversation', { conversation, contactId, userId })
+        const senderId = req.userId
+        const receiverId = req.params.receiverId
+        const sender = await business.getUserById(senderId)
+        const receiver = await business.getUserById(receiverId)
+
+        const conversation = await business.getConversation(senderId, receiverId)
+        res.render('conversation', {
+            conversation, 
+            sender: sender.username, 
+            receiver: receiver.username,
+            receiverId: receiverId  
+        })
+
     } catch (error) {
+
         console.error("Error fetching conversation:", error.message)
+        res.status(500).send("An error occurred while loading the conversation.")
+        
     }
 })
 
-app.post('/conversation/:contactId', attachSessionData, async (req, res) => {
+app.post('/conversation/:receiverId', attachSessionData, async (req, res) => {
     try {
+
         const { message } = req.body
         const senderId = req.userId
-        const receiverId = req.params.contactId
-
+        const receiverId = req.params.receiverId
+ 
         await business.sendMessage(senderId, receiverId, message)
+        await business.awardBadge(senderId, receiverId)
+        await business.awardBadge(receiverId, senderId)
+
         res.redirect(`/conversation/${receiverId}`)
+
     } catch (error) {
-        console.error("Error sending message:", error.message);
+
+        console.error("Error sending message:", error.message)
+        res.status(500).send("An error occurred while sending the message.")
+
     }
 })
 

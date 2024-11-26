@@ -280,13 +280,34 @@ async function getUserBadges(userId) {
     return await persistence.getUserBadges(userId)
 }
 
-async function awardBadge(userId) {
+async function hasReceivedReply(senderId, receiverId) {
+    const convo = await getConversation(senderId, receiverId)
+
+    if (convo.length >= 2) {
+        for (let i = 0; i < convo.length - 1; i++) {
+            const currentMessage = convo[i]
+            const nextMessage = convo[i + 1]
+
+            if (
+                currentMessage.senderId.toString() === senderId.toString() &&
+                currentMessage.receiverId.toString() === receiverId.toString() &&
+                nextMessage.senderId.toString() === receiverId.toString() &&
+                nextMessage.receiverId.toString() === senderId.toString()
+            ) {
+                return true
+            }
+        }
+    }
+    return false
+}
+
+async function awardBadge(senderId, receiverId) {
     try {
         const allBadges = await persistence.getAllBadges()
-        const userMessages = await persistence.getUserMessages(userId)
+        const userMessages = await persistence.getUserMessages(senderId)
         const badgeRules = {
             "First Conversation": async () => {
-                return userMessages.some(msg => msg.repliedTo)
+                return await hasReceivedReply(senderId, receiverId)
             },
             "100 Messages Sent": async () => {
                 return userMessages.length >= 100
@@ -294,12 +315,12 @@ async function awardBadge(userId) {
         }
 
         for (const badge of allBadges) {
-            const userBadges = await persistence.getUserBadges(userId)
+            const userBadges = await persistence.getUserBadges(senderId)
             if (userBadges.some(b => b.name === badge.name)) continue
 
             const isEligible = await badgeRules[badge.name]?.()
             if (isEligible) {
-                await persistence.awardBadge(userId, badge)
+                await persistence.awardBadge(senderId, badge)
             }
         }
     } catch (error) {

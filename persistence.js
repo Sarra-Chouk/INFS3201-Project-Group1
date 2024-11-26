@@ -350,6 +350,16 @@ async function getConversation(userId1, userId2) {
         .toArray()
 }
 
+async function getUserMessages(userId) {
+    try {
+        await connectDatabase()
+        const userMessages = await messages.find({ senderId: new ObjectId(userId) }).toArray()
+        return userMessages
+    } catch (error) {
+        console.error("Error fetching user messages:", error)
+    }
+}
+
 module.exports = {
     updateUserField,
     getUserById, getUserByUsername, getUserByEmail,
@@ -360,5 +370,5 @@ module.exports = {
     getMatchingUsers,
     addContact, removeContact, getContacts,
     getAllBadges, getUserBadges, awardBadge,
-    saveMessage, getConversation
+    saveMessage, getConversation, getUserMessages
 }
