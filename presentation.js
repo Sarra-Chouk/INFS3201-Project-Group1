@@ -254,11 +254,12 @@ async function attachSessionData(req, res, next) {
 app.get("/dashboard", attachSessionData, async (req, res) => {
     try {
         const message = req.query.message
+        const type = req.query.type
         const userId = req.userId
         const user = await business.getUserById(userId)
         const matchingUsers = await business.getMatchingUsers(userId)
 
-        res.render("dashboard", {matchingUsers, userId: userId, username: user.username, message})
+        res.render("dashboard", {matchingUsers, userId: userId, username: user.username, message, type})
 
     } catch (err) {
 
@@ -355,7 +356,7 @@ app.post('/conversation/:receiverId', attachSessionData, async (req, res) => {
         await business.sendMessage(senderId, receiverId, message)
         await business.awardBadge(senderId, receiverId)
         await business.awardBadge(receiverId, senderId)
-
+        
         res.redirect(`/conversation/${receiverId}`)
 
     } catch (error) {

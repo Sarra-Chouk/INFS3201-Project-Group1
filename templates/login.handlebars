@@ -13,7 +13,6 @@
         <div class="row justify-content-center">
             <div class="col-lg-10">
                 <div class="card-group d-block d-md-flex row">
-                    <!-- Login Section -->
                     <div class="card col-md-8 p-5 mb-0 fixed">
                         <div class="card-body">
                             {{#if message}}
@@ -52,7 +51,6 @@
                             </form>
                         </div>
                     </div>
-                    <!-- Signup Section -->
                     <div class="card col-md-4 text-white bg-primary py-5">
                         <div class="card-body d-flex justify-content-center align-items-center">
                             <div class="text-center">
@@ -66,7 +64,6 @@
             </div>
         </div>
     </div>
-
     <script>
         const togglePassword = document.querySelector('#togglePassword');
         const password = document.querySelector('#password');
@@ -75,11 +72,9 @@
             // Toggle the type attribute
             const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
             password.setAttribute('type', type);
-
             // Toggle the eye icon class
             togglePassword.classList.toggle('bi-eye');
             togglePassword.classList.toggle('bi-eye-slash');
         });
     </script>
-
 </body>
