@@ -93,13 +93,15 @@
               {{/each}}
             </td>
             <td>
-              <form action="/add-contact/{{this._id}}">
+              <form action="/add-contact/{{this._id}}" style="display:inline;">
                 <button class="btn btn-success btn-sm">
                   <i class="bi bi-person-plus-fill m-1"></i>Add Contact
                 </button>
-                <form action="/block-contact/{{this._id}}">
-                  <button class="btn btn-danger btn-sm"><i class="bi bi-ban m-1"></i>Block Contact</button>
-                </form>
+              </form>
+
+              <form action="/block-contact/{{this._id}}" style="display:inline;">
+                <button class="btn btn-danger btn-sm "><i class="bi bi-ban m-1"></i>Block Contact</button>
+              </form>
             </td>
           </tr>
           {{/each}}

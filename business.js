@@ -215,17 +215,6 @@ async function getContacts(userId) {
 }
 
 async function addContact(userId, contactId) {
-    const contactProfile = await getProfile(contactId)
-    if (!contactProfile) {
-        throw new Error("Contact not found.")
-    }
-    if (contactProfile.blockedBy) {
-        for (const blockedUserId of contactProfile.blockedBy) {
-            if (blockedUserId === userId) {
-                throw new Error("You cannot add a user who has blocked you.")
-            }
-        }
-    }
     await persistence.addContact(userId, contactId);
 }
 
@@ -312,6 +301,10 @@ async function cancelToken(key) {
     await persistence.updateSession(key, sessionData)
 }
 
+async function blockContact(userId, contactId){
+    await persistence.blockContact(userId, contactId)
+}
+
 module.exports = {
     getUserById, getUserByEmail,
     validateEmail, checkEmailExists, validatePassword, validateUsername, validateProfilePicture,
@@ -325,5 +318,6 @@ module.exports = {
     getProfile,
     getUserBadges, awardBadge,
     sendMessage, getConversation,
-    generateFormToken, cancelToken
+    generateFormToken, cancelToken,
+    blockContact
 }

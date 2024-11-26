@@ -257,7 +257,7 @@ app.get("/dashboard", attachSessionData, async (req, res) => {
         const user = await business.getUserById(userId)
         const matchingUsers = await business.getMatchingUsers(userId)
 
-        res.render("dashboard", {matchingUsers, userId: userId, username: user.username, message})
+        res.render("dashboard", {matchingUsers, userId: userId, username: user.username, message,})
 
     } catch (err) {
 
@@ -293,6 +293,19 @@ app.get("/add-contact/:contactId", attachSessionData, async (req, res) => {
 
         await business.addContact(userId, contactId)
         res.redirect(`/dashboard?message=${encodeURIComponent("Contact was added successfully!.")}&type=success`)
+    } catch (error) {
+        console.error("Error fetching conversation:", error.message)
+    }
+})
+
+
+app.get("/block-contact/:contactId", attachSessionData, async (req, res) => {
+    try {
+        const contactId = req.params.contactId
+        const userId = req.userId
+
+        await business.blockContact(userId, contactId)
+        res.redirect(`/dashboard?message=${encodeURIComponent("Contact was blocked successfully!.")}&type=success`)
     } catch (error) {
         console.error("Error fetching conversation:", error.message)
     }

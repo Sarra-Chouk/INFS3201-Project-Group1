@@ -240,12 +240,26 @@ async function getMatchingUsers(userId) {
         await connectDatabase()
         const user = await users.findOne({ _id: new ObjectId(userId) })
         let learningLanguages = user.learningLanguages
-        const matchingUsers = await users.find(
-            {
-                knownLanguages: { $in: learningLanguages },
-                username: { $ne: new ObjectId(userId) }
+        let blockedContacts = user.blockedContacts
+        let matchingUsers = []
+
+        if(blockedContacts){
+            matchingUsers = await users.find({
+            knownLanguages: { $in: learningLanguages },
+            _id: { 
+                $ne: new ObjectId(userId),
+                $nin: blockedContacts
             }
-        ).toArray()
+        }).toArray()
+    } else{
+        matchingUsers = await users.find({
+            knownLanguages: { $in: learningLanguages },
+            _id: { 
+                $ne: new ObjectId(userId),
+            }
+        }).toArray()
+    }  
+
         logInfo(`Found ${matchingUsers.length} matching users for userId: ${userId}`)
         return matchingUsers
     }
@@ -261,6 +275,8 @@ async function addContact(userId, contactId) {
             { _id: new ObjectId(userId) },
             { $addToSet: { contacts: contactId } }
         )
+        logInfo(`User: ${userId} successfully added: ${contactId}`)
+
     } catch (error) {
         logError(`Error adding contact for userId: ${userId}, contactId: ${contactId} - ${error}`)
     }
@@ -431,6 +447,19 @@ async function getUserMessages(userId) {
     }
 }
 
+async function blockContact(userId, contactId) {
+    try {
+        await connectDatabase()
+        await users.updateOne(
+            { _id: new ObjectId(userId) },
+            { $addToSet: { blockedContacts: contactId } }
+        )
+        logInfo(`User: ${userId} successfully added: ${contactId}`)
+    } catch (error) {
+        logError(`Error blocking contact for userId: ${userId}, contactId: ${contactId} - ${error}`)
+    }
+}
+
 module.exports = {
     updateUserField,
     getUserById, getUserByUsername, getUserByEmail,
@@ -441,5 +470,6 @@ module.exports = {
     getMatchingUsers,
     addContact, removeContact, getContacts,
     getAllBadges, getUserBadges, awardBadge,
-    saveMessage, getConversation, getUserMessages
+    saveMessage, getConversation, getUserMessages,
+    blockContact
 }
