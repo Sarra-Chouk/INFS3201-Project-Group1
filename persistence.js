@@ -1,7 +1,21 @@
+/**
+ * Logs informational messages to the console with optional details.
+ *
+ * @function logInfo
+ * @param {string} message - The informational message to log.
+ * @param {Object} [details={}] - Additional details to include with the log message.
+ */
 function logInfo(message, details = {}) {
     console.log(`[INFO] ${message}`, Object.keys(details).length ? details : '')
 }
 
+/**
+ * Logs error messages to the console with optional error details.
+ *
+ * @function logError
+ * @param {string} message - The error message to log.
+ * @param {Error|string} error - The error object or message to include with the log.
+ */
 function logError(message, error) {
     console.error(`[ERROR] ${message}`, error?.message || error)
 }
@@ -472,6 +486,8 @@ async function getContacts(userId) {
     }
 }
 
+
+
 async function blockContact(userId, contactId) {
     try {
         await connectDatabase()
@@ -702,6 +718,31 @@ async function blockContact(userId, contactId) {
     }
 }
 
+async function getBlockedContacts(userId) {
+    try {
+        await connectDatabase()
+        const user = await users.findOne(
+            { _id: new ObjectId(userId) }
+        )
+        if (!user) {
+            logInfo(`No user found with userId: ${userId}`)
+            return []
+        }
+        if (user.blockedContacts && user.blockedContacts.length > 0) {
+            const blockedContacts = await users.find(
+                { _id: { $in: user.blockedContacts.map(id => new ObjectId(id)) } }
+            ).toArray()
+
+            logInfo(`Retrieved ${blockedContacts.length} blocked contacts for userId: ${userId}`)
+            return blockedContacts
+        }
+        logInfo(`No blocked contacts found for userId: ${userId}`)
+        return []
+    } catch (error) {
+        logError(`Error retrieving blocked contacts for userId: ${userId} - ${error}`)
+    }
+}
+
 module.exports = {
     updateUserField,
     getUserById, getUserByUsername, getUserByEmail,
@@ -714,4 +755,5 @@ module.exports = {
     blockContact,
     getAllBadges, getUserBadges, awardBadge,
     saveMessage, getConversation, getUserMessages,
+    blockContact, getBlockedContacts
 }

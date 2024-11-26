@@ -226,6 +226,10 @@ async function blockContact(userId, contactId){
     await persistence.blockContact(userId, contactId)
 }
 
+async function getBlockedContacts(userId) {
+    await persistence.getBlockedContacts(userId)
+}
+
 async function getProfile(userId) {
     const user = await persistence.getUserById(userId)
     if (!user) {
@@ -323,4 +327,5 @@ module.exports = {
     getUserBadges, awardBadge,
     sendMessage, getConversation,
     generateFormToken, cancelToken,
+    blockContact
 }
