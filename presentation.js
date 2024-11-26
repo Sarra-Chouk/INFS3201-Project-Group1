@@ -672,28 +672,38 @@ app.get("/blocked-contacts", attachSessionData, async (req, res) => {
  */
 app.get('/conversation/:receiverId', attachSessionData, async (req, res) => {
     try {
+        const senderId = req.userId;
+        const receiverId = req.params.receiverId;
 
-        const senderId = req.userId
-        const receiverId = req.params.receiverId
+        const isBlocked = await business.isBlocked(senderId, receiverId)
+
         const sender = await business.getUserById(senderId)
         const receiver = await business.getUserById(receiverId)
-        const csrfToken = await business.generateFormToken(req.cookies.sessionKey)
 
+        if (isBlocked) {
+            return res.render('conversation', {
+                message: "You are blocked by this user and cannot initiate a conversation.",
+                isBlocked: true, 
+                sender: sender.username,
+                receiver: receiver.username
+            })
+        }
+
+        const csrfToken = await business.generateFormToken(req.cookies.sessionKey)
         const conversation = await business.getConversation(senderId, receiverId)
+
         res.render('conversation', {
-            conversation, 
-            sender: sender.username, 
+            conversation,
+            sender: sender.username,
             receiver: receiver.username,
             senderId: senderId,
             receiverId: receiverId,
-            csrfToken
+            csrfToken,
+            isBlocked: false 
         })
-
     } catch (error) {
-
-        console.error("Error fetching conversation:", error.message)
+        console.error("Error fetching conversation:", error.message);
         res.status(500).send("An error occurred while loading the conversation.")
-        
     }
 })
 

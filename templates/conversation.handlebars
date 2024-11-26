@@ -98,7 +98,11 @@
             <h1>Chat with {{receiver}}</h1>
         </div>
     </div>
-
+    {{#if isBlocked}}
+    <div class="blocked-message">
+        {{message}}
+    </div>
+    {{else}}
     {{#each conversation}}
     <div class="message {{#if senderIsCurrentUser}}sent{{else}}received{{/if}}">
         <p>{{this.message}}</p>
@@ -111,4 +115,5 @@
         <textarea name="message" class="message-input" placeholder="Type your message..." required></textarea>
         <button type="submit" class="send-button">Send</button>
     </form>
+    {{/if}}
 </body>
