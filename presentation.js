@@ -351,20 +351,21 @@ app.get("/block-contact/:contactId", attachSessionData, async (req, res) => {
 
 
 app.get("/blocked-contacts", attachSessionData, async (req, res) => {
-
     const userId = req.userId
     const message = req.query.message
     const type = req.query.type
 
     try {
-      const blockedContacts = await business.getBlockedContacts(userId)
-      res.render('blockedContacts', {
-        blockedContacts: blockedContacts,
-        message: message,
-        type: type
-      })
+        const blockedContacts = await business.getBlockedContacts(userId)
+
+        res.render('blockedContacts', {
+            blockedContacts: blockedContacts,
+            message: message,
+            type: type
+        })
     } catch (err) {
-      res.status(500).send('Error fetching data');
+        console.error("Error fetching blocked contacts:", err.message)
+        res.status(500).send('Error fetching data')
     }
 })
 
