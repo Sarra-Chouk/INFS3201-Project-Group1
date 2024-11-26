@@ -669,13 +669,13 @@ app.get("/blocked-contacts", attachSessionData, async (req, res) => {
 })
 /**
  * GET /conversation/:receiverId
- * Fetches the conversation between the logged-in user (sender) and the specified receiver.
- * Renders the conversation page with messages and user details.
+ * Handles conversation retrieval between the logged-in user (sender) and the specified receiver.
+ * Displays a message if the user is blocked; otherwise, renders the conversation.
  *
  * @param {Object} req - The request object.
  * @param {Object} res - The response object.
- * @param {string} req.params.receiverId - The ID of the conversation's receiver.
- * @param {string} req.userId - The ID of the currently logged-in user (sender) from session.
+ * @param {string} req.params.receiverId - The ID of the receiver in the conversation.
+ * @param {string} req.userId - The ID of the currently logged-in user (sender) from the session.
  *
  * @returns {void} Renders the "conversation" view or sends an error response.
  */
