@@ -52,6 +52,7 @@
     }
 
     .message-input-container {
+        width: 100%;
         display: flex;
         margin-top: 20px;
         justify-content: space-between;
@@ -98,20 +99,16 @@
         </div>
     </div>
 
-    <div class="body flex-grow-1 px-3">
-        <div class="container-lg conversation-container">
-            {{#each conversation}}
-            <div class="message {{#if senderIsCurrentUser}}sent{{else}}received{{/if}}">
-                <p>{{this.message}}</p>
-                <small>{{formatDate this.timestamp}}</small>
-            </div>
-            {{/each}}
-
-            <form action="/conversation/{{receiverId}}" method="POST" class="message-input-container">
-                <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
-                <textarea name="message" class="message-input" placeholder="Type your message..." required></textarea>
-                <button type="submit" class="send-button">Send</button>
-            </form>
-        </div>
+    {{#each conversation}}
+    <div class="message {{#if senderIsCurrentUser}}sent{{else}}received{{/if}}">
+        <p>{{this.message}}</p>
+        <small>{{formatDate this.timestamp}}</small>
     </div>
+    {{/each}}
+
+    <form action="/conversation/{{receiverId}}" method="POST" class="message-input-container">
+        <input type="hidden" name="csrfToken" value="{{csrfToken}}" />
+        <textarea name="message" class="message-input" placeholder="Type your message..." required></textarea>
+        <button type="submit" class="send-button">Send</button>
+    </form>
 </body>

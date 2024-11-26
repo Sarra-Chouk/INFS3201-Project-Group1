@@ -685,6 +685,7 @@ app.get('/conversation/:receiverId', attachSessionData, async (req, res) => {
             conversation, 
             sender: sender.username, 
             receiver: receiver.username,
+            senderId: senderId,
             receiverId: receiverId,
             csrfToken
         })
