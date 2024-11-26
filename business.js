@@ -499,10 +499,25 @@ async function blockContact(userId, contactId){
     await persistence.blockContact(userId, contactId)
 }
 
+/**
+ * Retrieves the blocked contacts for a given user.
+ * 
+ * @param {string} userId - The ID of the user whose blocked contacts are to be retrieved.
+ * 
+ * @returns {Promise<Array>} A promise that resolves to a list of blocked contacts.
+ */
 async function getBlockedContacts(userId) {
     return await persistence.getBlockedContacts(userId)
 }
 
+/**
+ * Unblocks a contact for a given user.
+ * 
+ * @param {string} userId - The ID of the user who wants to unblock the contact.
+ * @param {string} contactId - The ID of the contact to unblock.
+ * 
+ * @returns {Promise<void>} A promise that resolves once the contact is unblocked.
+ */
 async function unblockContact(userId, contactId) {
     await persistence.unblockContact(userId, contactId);
 }

@@ -716,6 +716,13 @@ async function blockContact(userId, contactId) {
     }
 }
 
+/**
+ * Retrieves the blocked contacts for a given user.
+ * 
+ * @param {string} userId - The ID of the user whose blocked contacts are to be retrieved.
+ * 
+ * @returns {Array} A list of blocked contacts, or an empty array if no blocked contacts are found.
+ */
 async function getBlockedContacts(userId) {
     try {
         await connectDatabase();
@@ -739,6 +746,14 @@ async function getBlockedContacts(userId) {
     }
 }
 
+/**
+ * Unblocks a contact for a given user.
+ * 
+ * @param {string} userId - The ID of the user who wants to unblock the contact.
+ * @param {string} contactId - The ID of the contact to unblock.
+ * 
+ * @returns {void} Logs the result of the unblocking operation.
+ */
 async function unblockContact(userId, contactId) {
     try {
         await connectDatabase()
