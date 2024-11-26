@@ -24,15 +24,43 @@ app.use('/images', express.static(__dirname + "/static/profilePictures"))
 app.use('/badges', express.static(__dirname + '/static/badges'))
 app.use(fileUpload())
 
+app.get("/add-contact/:contactId", attachSessionData, async (req, res) => {
+    try {
+        const contactId = req.params.contactId
+        const userId = req.userId
+
+        await business.addContact(userId, contactId)
+        res.redirect(`/dashboard?message=${encodeURIComponent("Contact was added successfully!.")}&type=success`)
+    } catch (error) {
+        console.error("Error fetching conversation:", error.message)
+    }
+})
+
+app.get("/my-contacts", attachSessionData, async (req, res) => {
+
+    const userId = req.userId;
+
+    try {
+      const contacts = await business.getContacts(userId);
+      
+      res.render('myContacts', {
+        contacts: contacts
+      });
+    } catch (err) {
+      res.status(500).send('Error fetching data');
+    }
+})
+
+
+
 app.get("/dashboard", attachSessionData, async (req, res) => {
     try {
-
+        const message = req.query.message
         const userId = req.userId
         const user = await business.getUserById(userId)
-        console.log(user)
         const matchingUsers = await business.getMatchingUsers(userId)
 
-        res.render("dashboard", {matchingUsers, userId: userId, username: user.username})
+        res.render("dashboard", {matchingUsers, userId: userId, username: user.username, message})
 
     } catch (err) {
 
@@ -61,19 +89,6 @@ app.get("/profile", attachSessionData, async (req, res) => {
     }
 })
 
-app.get("/my-contacts", attachSessionData, async (req, res) => {
-
-    const userId = req.userId;
-
-    try {
-      const contacts = await business.getMatchingUsers(userId);
-      res.render('myContacts', {
-        contacts,
-      });
-    } catch (err) {
-      res.status(500).send('Error fetching data');
-    }
-})
 
 app.get("/blocked-contacts", (req, res) => {
     res.render("blockedContacts")

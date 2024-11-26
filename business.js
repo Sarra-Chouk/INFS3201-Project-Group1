@@ -230,7 +230,7 @@ async function getContacts(userId){
 async function addContact(userId, contactId) {
     try {
        
-        const contactProfile = await persistence.getUserProfile(contactId);
+        const contactProfile = await getProfile(contactId);
         if (!contactProfile) {
             throw new Error("Contact not found.");
         }
