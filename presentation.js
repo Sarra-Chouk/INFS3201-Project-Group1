@@ -667,20 +667,17 @@ app.get("/blocked-contacts", attachSessionData, async (req, res) => {
         res.status(500).send('Error fetching data')
     }
 })
-
 /**
- * Route handler for the "/conversation/:receiverId" page.
- * Fetches and renders the conversation between the logged-in user (sender) and another user (receiver).
- * Requires session data, validated by the `attachSessionData` middleware.
- * 
+ * GET /conversation/:receiverId
+ * Fetches the conversation between the logged-in user (sender) and the specified receiver.
+ * Renders the conversation page with messages and user details.
+ *
  * @param {Object} req - The request object.
  * @param {Object} res - The response object.
- * @param {string} req.params.receiverId - The ID of the receiver in the conversation.
- * @param {string} req.userId - The ID of the currently logged-in user (sender), extracted from session data.
- * 
- * @throws {Error} If any error occurs while fetching the conversation or user data.
- * 
- * @returns {void} Renders the "conversation" view with the conversation details and user information.
+ * @param {string} req.params.receiverId - The ID of the conversation's receiver.
+ * @param {string} req.userId - The ID of the currently logged-in user (sender) from session.
+ *
+ * @returns {void} Renders the "conversation" view or sends an error response.
  */
 app.get('/conversation/:receiverId', attachSessionData, async (req, res) => {
     try {
